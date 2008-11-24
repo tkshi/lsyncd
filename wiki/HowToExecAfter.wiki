@@ -28,3 +28,5 @@ echo "$src -> $dst" >> /tmp/whatitdid || true
 # returns the exit code of rsync to lsyncd
 exit $err
 }}}
+
+Note: I (Axel, for now author of this page) am not that much of a bash guru, so if you can improve the script please write an email...
