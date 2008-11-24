@@ -1,0 +1,5 @@
+HowTos, Tips and Tricks for more complicated uses:
+
+ * [HowToDoMasks] : How to sync all local `/home/[user]/www` directories to a remote web server. ((This is BTW the usecase why lsyncd was created))
+
+ * [HowToExecAfter] : How to execute a script after each rsync operation
