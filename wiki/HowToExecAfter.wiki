@@ -5,11 +5,11 @@
 This supposes lsyncd version 1.25 that is yet to be released. But should just as well with version 1.0.
 
 = Details =
-If you want to execute some code everytime lsyncd invoked an rsync operation you can do by replacing the rsync binary lsyncd calls with the --binary command line parameter or the <binary> entry in a [lsyncd.conf.xml] file. (Use --rsync-binary if you use lsyncd version 1.0)
+If you want to execute some code everytime lsyncd invoked an rsync operation you can do by replacing the rsync binary lsyncd calls with the --binary command line parameter or the `<binary>` entry in a [lsyncd.conf.xml] file. (Use --rsync-binary if you use lsyncd version 1.0)
 
 Instead of letting lsyncd invoke the rsync binary directly let it execude following shell script instead. Put it anywhere you like.
 
-This script will execute the rsync binary eitherway, just as lsyncd expects and after rsync returned, you get your chance to perform other stuff, whatever it may be.
+This script will execute the rsync binary eitherway, just as lsyncd expects and after rsync returned, you get your chance to perform other stuff, whatever it may be. Note that lsyncd is halted and waits for this script to return before performing any other operations.
 
 {{{
 #!/bin/bash
