@@ -17,12 +17,11 @@
 #	 live mirror solution.
 ### END INIT INFO
 
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/bin/lsyncd
+LSYNCD_ENABLE=false
 NAME=lsyncd
-DESC=lsyncd
-LABEL=lsyncd
 USER=daemon
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 test -x $DAEMON || exit 0
 
@@ -44,49 +43,78 @@ set -e
 
 case "$1" in
   start)
-	log_daemon_msg "Starting lsyncd daemon" "lsyncd"
-	if [ -s $PIDFILE ] && kill -0 $(cat $PIDFILE) >/dev/null 2>&1; then
-		log_progress_msg "apparently already running"
-		log_end_msg 1
-		exit 0
-        fi
-
-	if start-stop-daemon --start --quiet --user $USER --pidfile $PIDFILE \
-		--exec $DAEMON -- --pidfile $PIDFILE $DAEMON_OPTS; then
-		rc=0
-		sleep 1
-		if ! kill -0 $(cat $PIDFILE) >/dev/null 2>&1; then
-			log_failure_ms "lsyncd daemon failed to start"
+	if "$LSYNCD_ENABLE"; then
+		log_daemon_msg "Starting lsyncd daemon" "lsyncd"
+		if [ -s $PIDFILE ] && kill -0 $(cat $PIDFILE) >/dev/null 2>&1; then
+			log_progress_msg "apparently already running"
+			log_end_msg 0
+			exit 0
+		fi
+		if start-stop-daemon --start --quiet --user $USER --pidfile $PIDFILE \
+			--exec $DAEMON -- --pidfile $PIDFILE $DAEMON_OPTS; then
+			rc=0
+			sleep 1
+			if ! kill -0 $(cat $PIDFILE) >/dev/null 2>&1; then
+				log_failure_ms "lsyncd daemon failed to start"
+				rc=1
+			fi
+		else
 			rc=1
 		fi
+		if [ $rc -eq 0 ]; then
+			log_end_msg 0
+		else
+			log_end_msg 1
+			rm -f $PIDFILE
+		fi
 	else
-		rc=1
-	fi
-	if [ $rc -eq 0 ]; then
-		log_end_msg 0
-	else
-		log_end_msg 1
-		rm -f $PIDFILE
+		log_warning_msg "lsyncd daemon not enabled, not starting..."
 	fi
 	;;
   stop)
 	log_daemon_msg "Stopping lsyncd daemon" "lsyncd"
-	start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $DAEMON
+	start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE --exec $DAEMON
 	log_end_msg $?
 	rm -f $PIDFILE
 	;;
   restart)
-    echo -n "Restarting $DESC: "
-	start-stop-daemon --stop --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON
-	[ -n "$DODTIME" ] && sleep $DODTIME
-	start-stop-daemon --start --quiet --pidfile \
-		/var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS
-	echo "$NAME."
+	set +e
+	if "$LSYNCD_ENABLE"; then
+		log_daemon_msg "Restarting lsyncd daemon" "lsyncd"
+		if [ -s $PIDFILE ] && kill -0 $(cat $PIDFILE) >/dev/null 2>&1; then
+			start-stop-daemon --stop --quiet --pidfile \
+				/var/run/$NAME.pid --exec $DAEMON
+		else 
+			log_warning_msg "lsyncd daemon not running, attempting to start."
+			rm -f $PIDFILE
+		fi
+
+		[ -n "$DODTIME" ] && sleep $DODTIME
+
+		if start-stop-daemon --start --quiet --user $USER --pidfile $PIDFILE \
+			--exec $DAEMON -- --pidfile $PIDFILE $DAEMON_OPTS; then
+			rc=0
+			sleep 1
+			if ! kill -0 $(cat $PIDFILE) >/dev/null 2>&1; then
+				log_failure_ms "lsyncd daemon failed to start"
+				rc=1
+			fi
+		else
+			rc=1
+		fi
+		if [ $rc -eq 0 ]; then
+			log_end_msg 0
+		else
+			log_end_msg 1
+			rm -f $PIDFILE
+		fi
+	else
+		log_warning_msg "lsyncd daemon not enabled, not restarting..."
+	fi
 	;;
   status)
 	status_of_proc -p $PIDFILE "$DAEMON" lsyncd && exit 0 || exit $?
-        ;;
+	;;
   *)
 	N=/etc/init.d/$NAME
 	echo "Usage: $N {start|stop|restart|status}" >&2
