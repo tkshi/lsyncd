@@ -1,0 +1,23 @@
+05-06-2009:  1.33
+	fix: exlude file argument passing to rsync	
+	fix: allow exlude files specified for individual sources
+	fix/enhancement: exlusions will be compared with extended
+	                 path files allowing sub dirs to be excluded.
+	enhancement: allow delays and call aggregation
+
+05-01-2009:  Release of lsyncd 1.26
+	fix: segfault on multitargets
+	changed meaning of "version" tag in lsyncd.conf.xml 
+
+14-12-2008:  Release of lsyncd 1.25
+	fix: mv dir and cp -r working
+	fix: working with reiserfs
+	enhancement: config files
+	enhancement: multiple targets
+	enhancement: pidfiles
+	optimized: memory usage
+	improved documentation
+	lots of smaller stuff here and there ...
+	Thanks to all contributers!
+
+05-12-2007:  Release of lsyncd 1.0 
