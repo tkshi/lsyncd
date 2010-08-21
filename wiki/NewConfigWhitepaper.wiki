@@ -1,0 +1,88 @@
+#summary Whitepaper for new ideas for a new config file
+
+= Introduction =
+
+As the fileformat for lsyncd.conf grows with its capabilities it is evident that it still centers on the simple source->target idea it start of. This paper discusses ideas about a more general action on event format. 
+
+= Details =
+
+The standard watch would look like this. Where "rsync" is a special case tag, for the standard target rsync.
+
+{{{
+<watch path="/path/to/dir">
+  <onchange scope="dir" delay="0">
+     <rsync target="hostname::modulename">
+  </onchange>
+</watch>
+}}}
+
+for configured actions many people got confused with lsyncd callopts format, so how about verbatim text?
+
+{{{
+<watch path="/path/to/dir">
+  <onchange scope="dir" delay="0">
+     <action>
+        /path/to/binary -sometext <sourcedir/> <destdir/> 
+     </action>
+  </onchange>
+</watch>
+}}}
+
+Moves:
+
+{{{
+<watch recursive="false" path="/path/to/dir">
+  <onmove>
+     <action>
+        ssh user@dest -c mv <srcpath> <destpath/>
+     </action>
+  </onmove>
+  <onchange scope="dir" delay="0">
+     <action>
+        /path/to/binary -sometext <sourcedir/> <destdir/> 
+     </action>
+  </onchange>
+</watch>
+}}}
+
+You could also combine for example per dir and per file actions
+
+{{{
+<watch recursive="false" path="/path/to/dir">
+  <onmove>
+     <action>
+        ssh user@dest -c mv <srcpath> <destpath/>
+     </action>
+  </onmove>
+  <onchange scope="dir" delay="3">
+     <action>
+        /path/to/binary -sometext <sourcedir/> <destdir/> 
+     </action>
+  </onchange>
+  <onchange scope="file" delay="0">
+     <action>
+        /path/to/otherbinary -sometext <sourcedir/> <destdir/> 
+     </action>
+  </onchange>
+</watch>
+}}}
+
+Honestly the XML start looking crammed.
+I'd also consider letting go of XML, and come up with a simpler but custom grammar:
+
+{{{
+
+global(
+  no-daemon,
+  logfile="/log/lsyncd",
+)
+
+watch(path="/path/to/dir") {
+   onchange(scope="dir", delay="0") {
+      action{ /path/to/binary -sometext <source> <dest>}
+      # comment for another action
+      action{ /path/to/binary -literalwithbackslash \> intoafile }
+   }
+}
+
+}}}
