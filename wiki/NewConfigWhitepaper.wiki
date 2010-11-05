@@ -9,7 +9,7 @@ settings = (
   logfile="/log/lsyncd",
 )
 -- (this is a comment, btw) 
-sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync)
+sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync}
 }}}
 
 You will be able to specify special behavior on moves of directory within the watched tree
@@ -19,16 +19,16 @@ function mymove(from, to)
     exec("/bin/ssh", "user@remotehost", "mv", from.pathname, to.pathname)
 end
 
-sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync, onmove = mymove)
+sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync, onmove = mymove}
 }}}
 
 Or instead of inheriting default behavior for rsync you can do you own stuff
 
 {{{
 function myaction(inlet)
-    local event = inlet.next_evet()
+    local event = inlet.next_event()
     exec("/usr/local/bin/myfuncyting", event.sourcename)
 end
 
-sync{source="/path/to/dir", target="host::module/somewhere/", action = myaction)
+sync{source="/path/to/dir", target="host::module/somewhere/", action = myaction}
 }}}
