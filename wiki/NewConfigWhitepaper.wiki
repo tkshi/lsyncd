@@ -6,13 +6,13 @@ To configure a default rsync behaviour:
 
 {{{
 settings = (
-  logfile="/log/lsyncd",
+  logfile="/var/log/lsyncd",
 )
 -- (this is a comment, btw) 
 sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync}
 }}}
 
-You will be able to specify special behavior on moves of directory within the watched tree
+You will be able to specify special behavior on moves of directory within the watched tree.
 
 {{{
 function mymove(from, to)
@@ -22,7 +22,7 @@ end
 sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync, onmove = mymove}
 }}}
 
-Or instead of inheriting default behavior for rsync you can do you own stuff
+Or instead of inheriting default behavior for rsync you can do you own funy stuff instead.
 
 {{{
 function myaction(inlet)
