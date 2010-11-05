@@ -1,88 +1,34 @@
 #summary Whitepaper for new ideas for a new config file
 
-= Introduction =
+Updated, this is how the config of lsyncd2 is roughly going to look like. It uses the LUA parser/vm to gather the behaviour configuration.
 
-As the fileformat for lsyncd.conf grows with its capabilities it is evident that it still centers on the simple source->target idea it start of. This paper discusses ideas about a more general action on event format. 
-
-= Details =
-
-The standard watch would look like this. Where "rsync" is a special case tag, for the standard target rsync.
+To configure a default rsync behaviour:
 
 {{{
-<watch path="/path/to/dir">
-  <onchange scope="dir" delay="0">
-     <rsync target="hostname::modulename">
-  </onchange>
-</watch>
-}}}
-
-for configured actions many people got confused with lsyncd callopts format, so how about verbatim text?
-
-{{{
-<watch path="/path/to/dir">
-  <onchange scope="dir" delay="0">
-     <action>
-        /path/to/binary -sometext <sourcedir/> <destdir/> 
-     </action>
-  </onchange>
-</watch>
-}}}
-
-Moves:
-
-{{{
-<watch recursive="false" path="/path/to/dir">
-  <onmove>
-     <action>
-        ssh user@dest -c mv <srcpath> <destpath/>
-     </action>
-  </onmove>
-  <onchange scope="dir" delay="0">
-     <action>
-        /path/to/binary -sometext <sourcedir/> <destdir/> 
-     </action>
-  </onchange>
-</watch>
-}}}
-
-You could also combine for example per dir and per file actions
-
-{{{
-<watch recursive="false" path="/path/to/dir">
-  <onmove>
-     <action>
-        ssh user@dest -c mv <srcpath> <destpath/>
-     </action>
-  </onmove>
-  <onchange scope="dir" delay="3">
-     <action>
-        /path/to/binary -sometext <sourcedir/> <destdir/> 
-     </action>
-  </onchange>
-  <onchange scope="file" delay="0">
-     <action>
-        /path/to/otherbinary -sometext <sourcedir/> <destdir/> 
-     </action>
-  </onchange>
-</watch>
-}}}
-
-Honestly the XML start looking crammed.
-I'd also consider letting go of XML, and come up with a simpler but custom grammar:
-
-{{{
-
-global(
-  no-daemon,
+settings = (
   logfile="/log/lsyncd",
 )
+-- (this is a comment, btw) 
+sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync)
+}}}
 
-watch(path="/path/to/dir") {
-   onchange(scope="dir", delay="0") {
-      action{ /path/to/binary -sometext <source> <dest>}
-      # comment for another action
-      action{ /path/to/binary -literalwithbackslash \> intoafile }
-   }
-}
+You will be able to specify special behavior on moves of directory within the watched tree
 
+{{{
+function mymove(from, to)
+    exec("/bin/ssh", "user@remotehost", "mv", from.pathname, to.pathname)
+end
+
+sync{source="/path/to/dir", target="host::module/somewhere/", default.rsync, onmove = mymove)
+}}}
+
+Or instead of inheriting default behavior for rsync you can do you own stuff
+
+{{{
+function myaction(inlet)
+    local event = inlet.next_evet()
+    exec("/usr/local/bin/myfuncyting", event.sourcename)
+end
+
+sync{source="/path/to/dir", target="host::module/somewhere/", action = myaction)
 }}}
