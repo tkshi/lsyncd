@@ -20,7 +20,7 @@ Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.
 
   * Consequently Lsyncd 2 has no binding to libxml2 anymore, but instead liblua5.1
 
-  * Users can create short scripts right within config file.
+  * Users can create short scripts right within the config file.
 
   * Effort has been made while making the most common application of lsyncd using rsync easy with default settings to keep lsyncd tidy as a general purpose file watching and action tool.
 
