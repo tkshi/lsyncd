@@ -1,4 +1,4 @@
-#summary User manual to lsyncd version 2.x.
+#summary Manual to lsyncd version 2.x.
 
 = Introduction =
 Lsyncd version 2.0 is currently being development as a complete recoding of Lsyncd 1.x. *This manual is as well in development*.
@@ -13,6 +13,10 @@ Lsyncd version 2.0 is currently being development as a complete recoding of Lsyn
   * Consequently lsyncd 2 has no binding to libxml2 anymore, but instead liblua5.1
   * A large part of the lsyncd daemon is now coded in Lua. 
 
+
+= Coding =
+
+== Why Lua and not {OtherLangage} =
 
 
 = Details =
