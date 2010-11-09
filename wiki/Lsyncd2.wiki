@@ -1,18 +1,22 @@
 #summary Manual to lsyncd version 2.x.
 
 = Introduction =
-Lsyncd version 2.0 is currently being development as a complete recoding of Lsyncd 1.x. *This manual is as well in development*.
+Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.x. *This manual is as well in development*.
 
 = What's new in 2.0? =
   * Lsyncd 2.x allows you to specify different actions for different kind of events. Particularly moves can now be implemented to be moved locally at the target instead of hitherto deletion of the source and retransfer of the destination.
-  * Multiple targets now each have their own waiting list of events. A slow responding targets server does no longer delay others.
+  * Multiple events on one file or directory are still collapsed as in Lsyncd 1.33+. But lsyncd 2 tracking the kind of event collapses events logically. E.g. A _Create_ and a _Modify_ will be collapsed in a _Create_, a _Modify_ and a _Delete_ in a _Delete_, a _Create_ and a _Delete_ within the wait time as it often happens with temporary files will annihalte each other and result in Lsyncd doing nothing.
+  * Multiple targets now each have their own waiting list of events. A slow responding targets server no longer delays other targets.
   * Lsyncd can be configured to run multiple processes at once for one child. It will resolve any conflicts and only run processes in parallel for files and directories that don't interfere with each other.
   * Lsyncd 2.x does no longer halt and wait for a return of child processes it spawned. The kernels inotify queue will thus continously being drained making _Overflows_ less likely.
   * There is now a "warmstart" option. Instead of the one hugh recursive rsync at startup, lsyncd can now directly start into normal operation. All local directories will be stacked as _Create_ events that will worked off in normal operation mode.
-  * The format of the config file has changed compeletly. Instead of XML the configuration file has to be valid [http://www.lua.org/ Lua syntax]. 
-  * Consequently lsyncd 2 has no binding to libxml2 anymore, but instead liblua5.1
-  * A large part of the lsyncd daemon is now coded in Lua. 
-
+  * The format of the config file has changed completely. Instead of XML the configuration file has to be valid [http://www.lua.org/ Lua syntax]. 
+  * Consequently Lsyncd 2 has no binding to libxml2 anymore, but instead liblua5.1
+  * Users can create short scripts right within config file.
+  * Effort has been made while making the most common application of lsyncd using rsync easy with default settings to keep lsyncd tidy as a general purpose file watching and action tool.
+  * Retry on network error is now an integral part of Lsyncd.
+  * The new setting "statusfile" will instruct lsyncd to periodically write a report of its status in this file. E.g. amount of directories being watched, events in queue, actions in process etc.
+  * A good part of the Lsyncd daemon itself is now coded in Lua. 
 
 = Developer Manual =
 
