@@ -14,8 +14,6 @@ Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.
 
   * Lsyncd 2.x does no longer halt and wait for a return of child processes it spawned. The kernels inotify queue will thus continously being drained making _Overflows_ less likely.
 
-  * There is now a "warmstart" option. Instead of the one hugh recursive rsync at startup, lsyncd can now directly start into normal operation. All local directories will be stacked as _Create_ events that will worked off in normal operation mode.
-
   * The format of the config file has changed completely. Instead of XML the configuration file has to be valid [http://www.lua.org/ Lua syntax]. 
 
   * Consequently Lsyncd 2 has no binding to libxml2 anymore, but instead liblua5.1
@@ -25,6 +23,8 @@ Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.
   * Effort has been made while making the most common application of lsyncd using rsync easy with default settings to keep lsyncd tidy as a general purpose file watching and action tool.
 
   * Retry on network error is now an integral part of Lsyncd.
+
+  * Has exclude patterns that work.
 
   * The new setting "statusfile" will instruct lsyncd to periodically write a report of its status in this file. E.g. amount of directories being watched, events in queue, actions in process etc.
 
