@@ -171,7 +171,7 @@ Example:
 sync{source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOpts="-ltus"}
 }}}
 
-== Layer 3 Configuration == 
+== Layer 3 Configuration: simple onAction Commands == 
 
 In this layer custom configuration can created. This example will use bash commands to keep a local directory in Sync.
 
@@ -220,21 +220,36 @@ When there is no {{{onMove}}} or the move goes into or out of the observed direc
 
 {{{onStartup}}} will always block all other actions for this _Sync_ until completed, regardless how big {{{maxProcesses}}} is.
 
-The action to be taken is specified as a Lua String. 
+The action to be taken is specified as a Lua String. Thus they can be delimited with anything Lua allows, thes are 'TEXT', "TEXT", or [[TEXT]] as used in {{onStartup}} in the example above. 
 
- {{{onCreate}}}, {{{onModify}}}, {{{onDelete}}}, {{{onMove}}} and {{{onStartup}}}.
+Any action starting with a "/" result in the binary starting at the beginning directly being called by Lsyncd. For example
+{{{
+   onCreate = "/usr/bin/zip /usr/var/all.zip ^sourceName"
+   onModify = "/usr/bin/zip /usr/var/all.zip ^sourceName"
+}}}
+will add any newly created and modified files to /usr/var/all.zip using absolute path names. Any action not starting with a "/" will result in Lsyncd spawning a shell to execute the action as command. For example see above.
 
-    onCreate = "cp -r ^sourcePathname ^targetPathname",
+Variable arguments are spe
 
-    onModify = "cp -r ^sourcePathname ^targetPathname",
+        { "%^pathname"cified with the caret symbol. It has been chosen over $ or other symbols to be less conflicting with standard shell conventions. 
 
-    onDelete = "rm -rf ^targetPathname",
+All possible variables
 
+|| ^source || The absolute path of the observed source directory. ||
+|| ^target || The "target" attribute of the config.               ||
+|| ^path || The relative path of the file or directory to the observed directory. Directories have a slash at the end. ||
+|| ^pathname || The relative path of the file or directory to the observed directory. Directories have no slash at the end. ||
+|| ^sourcePath || The absolute path of the observed source directory and the relative path of the file or directory. This equals the absolute local path of the file or directory. Directories have a slash at the end. ||
+|| ^sourcePathname || Same as ^sourcePath but directories have no slash at the end. ||
+|| ^targetPath || The "target" arrbiuted of the config appended by the relative path of the file or directory. Directories have a slash at the end. ||
+|| ^targetPathname || Same as ^targetPath but directories have no slash at the end. ||
+
+For {{{onMoves}}} a _o._ and or _d._ can be preppended to path, pathname, sourcePath sourcePathname, targetPath and targetPathname to specify the move origin or destination. Without neither the variables refers to the move origin. 
+
+From the example above, it moves the file or directory in the target directory.
+{{{
     onMove   = "mv ^o.targetPathname ^d.targetPathname",
-
-    onStartup = [[if [ "$(ls -A $1)" ]; then cp -r ^source* ^target; fi]],
-
-There are 5 
+}}}
 
 
 == Layer 2 Configuration == 
