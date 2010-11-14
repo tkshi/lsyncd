@@ -133,8 +133,34 @@ Valid keys for settings are:
 || statusFile      || = || FILENAME || periodically writes a status report to file ||
 || statusIntervall || = || NUMBER   || writes the status file at shortest every Number seconds ||
 
+Additionally some parameters can be configured, which are inherited by all _Syncs_ (see Layer 3)
+|| maxDelays       || = || NUMBER || When this number of delayed events is queued. Action will be taken ||
+|| maxProcesses    || = || NUMBER || Lysncd does not spawn more than these number of processes per sync ||
 
-== Layer 4 Configuration == 
+== Layer 4 Configuration: Default Behaviour == 
+
+You can simply choose from a set of default configurations. There are currently two configs to choose from: __rsync__ and __rsyncssh__.
+
+To sync a local directory using default rsync behaviour just add this to a config file:
+{{{
+sync{default.rsync, source="DIRNAME", target="DIRNAME"}
+}}}
+The order of the arguments is of no importance. If target is a local directory, take care it is an absolute pathname. You can add several syncs that way. The source dirs may be identical or one a subdirectory of another. {{{source}}} is an universal parameters that has must be given for every sync. All other {{{sync}}} parameters can differ depending on the behavior selected. Universally optional you can override the default or settings values {{{maxDelays}}} or {{{maxProcesses}}} per _Sync_. 
+
+Following are default behaviors explained you can select from.
+
+==== default.rsync ====
+The default rsync configuration will aggregate events up to 20 seconds or 1000 seperate uncollapsible events, which ever happens first. Then it will spawn one rsync with a filter of all files that actually changed. The filter list is transfered trough a pipe. A call from Lsyncd to rsync will thus look like this:
+{{{
+/usr/bin/rsync -ltsd --delete --include-from=- --exclude=* SOURCE TARGET
+}}}
+You can change the "-lts" part by specifying other {{{rsyncOps}}}. 'd' or 'r' options are appended to {{{rsyncOps}}} by default.rsync as needed.
+
+Example:
+{{{
+sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOpts="-ltus"}
+}}}
+
 
 == Layer 3 Configuration == 
 
