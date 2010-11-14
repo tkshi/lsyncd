@@ -347,7 +347,53 @@ Layer 3 is nothing else than Lsyncd automatically write Layer 2 functions for yo
 
 == Layer 1 Configuration: Inlets == 
 
+Layer 2 allows you to create one process per one event. However, as with default rsync behavior you might want to call one process for several events. This can be done with inlets. When any event becomes ready Lsyncd calls the {{{action}}} entry with {{{inlet}}} as parameter. The {{{inlet}}} can be used to grap ready single events or event lists.
 
+For example this is the action used by default.rsync:
+{{{
+action = function(inlet)
+   local elist = inlet.getEvents()
+   local config = inlet.getConfig()
+   local paths = elist.getPaths()
+   log("Normal", "rsyncing list\n", paths)
+   spawn(elist, "/usr/bin/rsync",
+       "<", paths,
+       "--delete",
+       config.rsyncOps .. "d",
+       "--include-from=-",
+       "--exclude=*",
+       config.source, config.target)
+}}}
+
+Inlet functions are
+|| inlet.getEvent()  || Retrieves the next {{{event}}} as in Layer 2 configuration. Multiple calls to getEvent() will return the same event unless it has spawn{}ed an action. ||
+|| inlet.getEvents(test) || Returns a list of all events that are ready. {{{test}}} is optional for a function that will be called for every event to test if it should be included in the list. It has one parameter the {{{event}}} and returns true if an event should be included. If nil every ready event will be included in the list ||
+|| inlet.discardEvent() || Discards an event. The next call to getEvent will thus receive another event, even if no action has been spawned for this event ||
+|| inlet.getConfig()    || returns the same as {{{event.config}}}. The configuration of the sync{} ||
+|| inlet.addExclude()   || adds an exclusion pattern to this sync (see Exclusions) ||
+|| inlet.rmExclude()    || removes an exclusion pattern from this sync ||
+|| inlet.createBlanketEvent() || puts an {{{event}}} on the top of the Delay FIFO that blocks all events and is blocked by all events. This is used for onStartup.  ||
+
+
+{{{
+-----
+-- Default action calls user scripts on**** functions.
+--
+action = function(inlet)
+    -- in case of moves getEvent returns the origin and dest of the move
+    local event, event2 = inlet.getEvent()
+    local config = inlet.getConfig()
+    local func = config["on".. event.etype]
+    if func then
+        func(event, event2)
+    end 
+    -- if function didnt change the wait status its not interested
+    -- in this event -> drop it.
+    if event.status == "wait" then
+        inlet.discardEvent(event)
+    end 
+end,
+}}}
 
 = Examples =
 
