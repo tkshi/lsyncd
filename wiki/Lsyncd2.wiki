@@ -310,6 +310,35 @@ end
 ===== terminate(exitcode) =====
 Lets Lsyncd terminate with {{{{exitcode}}}}.
 
+==== event =====
+Variables of the actions are given by the _event_ field. It has following fields.
+
+|| event.config         || the configuration as called with sync{}.  ||
+|| event.inlet          || see layer 1 about inlets                  ||
+|| event.etype          || the event type. Can be 'ATTRIB', 'CREATE', 'MODIFY', 'DELETE', 'MOVE' ||
+|| event.status         || the status of the event. 'wait' when it is ready to be spawned and 'active' if there is a process running associated with this event ||
+|| event.isdir          || true if the event relates to a directory ||
+|| event.name           || the filename. directories end with a slash ||
+|| event.basename       || the filename. directories do not end with a slash ||
+|| event.path           || see ^path of layer 2 ||
+|| event.pathname       || see ^pathname of layer 2 ||
+|| event.source         || see ^source of layer 2 ||
+|| event.sourcePath     || see ^sourcePath of layer 2 ||
+|| event.sourcePathname || see ^sourcePathname of layer 2 ||
+|| event.target         || see ^target of layer 2 ||
+|| event.targetPath     || see ^targetPath of layer 2 ||
+|| event.targetPathname || see ^targetPathname of layer 2 ||
+
+onMove actions have two events as parameter, the origin and the destination of the move.
+
+This example will tattle about all moves within the observed dirotery tree.
+{{{
+tattleMove = {
+    onMove = function(oEvent, dEvent)
+        log("Normal", "A moved happened from ",oEvent.pathname," to ",dEvent.pathname)
+    end,
+}}}
+
 == Layer 1 Configuration:  == 
 
 = Examples =
