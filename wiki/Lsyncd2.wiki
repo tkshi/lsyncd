@@ -41,7 +41,7 @@ sudo make install
 
 When you grabbed the source directly from subversion run {{{./autogen.sh}}} first.
 
-With this standard configuration the parts of Lsyncd written in Lua ("the runner") will be compiled into the binary. This results into a self-sufficient one-file binary. The runner can be left as external file with the {{{--with-runner=DIRECTORY}}} option. 
+With this standard configuration the parts of Lsyncd written in Lua (the runner) will be compiled into the binary. This results into a self-sufficient one-file binary. But Lsyncd can be configured to load the runner from an external file with the {{{--with-runner=DIRECTORY}}} option. This is especially useful in Lsyncd development.
 
 = Invoking Lsyncd =
 
@@ -115,9 +115,10 @@ lsyncd -runner RUNNERFILE
 
 = Developer Manual =
 
-When developing it is wise to configure lsyncd to use the runner in the development directory. So you do not have to rerun make everytime you change lsyncd.lua.
+When developing it is wise to configure Lsyncd to load the runner from your development directory. So you do not have to rerun make every time you change {{{lsyncd.lua}}}.
 {{{
 ./configure --with-runner=/home/USER/lsyncd2/
 }}}
 
 == Why Lua and not ...? =
+x
