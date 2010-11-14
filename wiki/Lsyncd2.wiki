@@ -284,6 +284,8 @@ All other values let Lsyncd continue normally.
 
 == Layer 2 Configuration: Advanced onAction Commands == 
 
+While Layer 4 and 3 feel like normal configuration files, Layer 2 and 1 enter the realm of coding. It is thus supposed you have some coding knowledge when using Layer 2 or 1.
+
 Instead of designating actions as strings as in Layer 3 Lua functions can used to do some small scripts right within Lsyncd.
 
 This example will convert any convert any file with the suffix ".ps" created in a directory into a pdf.
