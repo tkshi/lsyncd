@@ -519,11 +519,38 @@ Lsycnd 2.0 release
 While work could go on, there is a moment to call things pause and postpone some work to later.
 
 Lsyncd 2.1+: (any future versions)
-* Optimization of the _Delay_ construct. Lsyncd goes a few times linearly through its delay Fifo where it would not have to. Code it as Queue and use pathnames as hashtables to quickly find blocks.
-* fanotify support - brand new in linux 2.6.36, supercedes inotify and using this saves a lot of kernel memory if watching big source dirs.
-* fsevents support - similar to i/fanotify, but on OS X 
-* support for includes, currently only masks for excludes are supported.
-* Supposedly tons of bug fixes to Lsyncd 2.0(betaX)
+ * Optimization of the _Delay_ construct. Lsyncd goes a few times linearly through its delay Fifo where it would not have to. Code it as Queue and use pathnames as hashtables to quickly find blocks.
+ * fanotify support - brand new in linux 2.6.36, supercedes inotify and using this saves a lot of kernel memory if watching big source dirs.
+ * fsevents support - similar to i/fanotify, but on OS X 
+ * support for includes, currently only masks for excludes are supported.
+ * Supposedly tons of bug fixes to Lsyncd 2.0(betaX)
+
+== Code structure / Style guide ==
+At large Lsyncds in source code comment documentation is well developed - at least compared to many other software projects. Here thus only a few outlining words.
+
+Lsyncd 2 is partially written in C, partially written in Lua. For some code pieces it is a free decision in which it could be coded, but for most one of the two was more appropriate. Generally the goal was if there was no good reason to code something in C do it in Lua. The C core thus does all the stuff close to the operating system:
+ * inotify interface
+ * process management, zombie collection
+ * signals
+ * pipes 
+ * logging (also in the core, so it can log itself comfortably)
+ * alarms (lsyncd uses kernel jiffies as alarms, thus it should be year Y2K38 safe (the year in which an often used time measurement - seconds since 1970 will overflow)
+Everything else is done in lsyncd.lua.
+
+While Lua is not an object oriented language itself, it supplies a set of features which can emulate its features quite nicely. Shortly spoken, it supports prototyping. Lsyncd makes use of local function scoping to create blocks of code which are loosely connected with each other. A major feature of object oriented language.
+
+A typical "class" in Lsyncd looks like this.
+{{{
+MyClass = (function()
+    local private = "only visible here"
+    local function new() 
+        return {foo="bar"}
+    end
+    -- public interface
+    return { new = new }
+end)()
+}}}
+In plain interpretation this creates a global variable called "MyClass". It defines an unnamed function with internal variables and subfunctions. This functions returns a table of all functions that should be visible from the outside. Then the unnamed function is called at the public interface table stored in "MyClass". {{{MyClass.new()}}} is then used to create objects of this class.
 
 == Why Lua and not ...? =
 Lua has been chosen for Lsyncd 2 much out of the same reasons why C was chosen for Lsyncd 1.x. Lsyncd should be small and fast and should come with as few as possible dependencies. 
