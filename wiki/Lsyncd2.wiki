@@ -112,6 +112,35 @@ lsyncd -runner RUNNERFILE
 
 = The Configuration File =
 
+Lsyncd configurations files are valid [http://www.lua.org/ Lua syntax]. It is designed to be simple yet potent. While rich configuration and simplicity are not opposites by themselves some trade-offs are inevitable. Do achieve both goals as far as possible, Lsyncd configuration can be done at different layers. Lower layers add adaptability while the interface becomes a bit more engaging.
+
+== Settings ==
+
+For scripts of all layers, with the global variable {{{settings}}} daemon wide configurations can be specified. Every settings has to have a key and value. 
+
+For example following code will tell Lsyncd to log into {{{/tmp/lsyncd.log}}}, periodically update the file {{{/tmp/lsyncd.status}}} with its status and to not detach as daemon.
+{{{
+settings = 
+   logfile    = "/tmp/lsyncd.log",
+   statusFile = "/tmp/lsyncd.status",
+   nodaemon   = true,
+}}}
+
+
+Valid keys for settings are:
+|| logfile         || = || FILENAME || logs into this file                         ||
+|| nodaemon        || = || true     || does not detach                             ||
+|| statusFile      || = || FILENAME || periodically writes a status report to file ||
+|| statusIntervall || = || NUMBER   || writes the status file at shortest every Number seconds ||
+
+
+== Layer 4 Configuration == 
+
+== Layer 3 Configuration == 
+
+== Layer 2 Configuration == 
+
+== Layer 1 Configuration == 
 
 = Examples =
 
