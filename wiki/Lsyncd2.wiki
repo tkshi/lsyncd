@@ -1,4 +1,4 @@
-#summary Manual to lsyncd version 2.x.
+#summary Manual to Lsyncd Version 2.x.
 
 = Introduction =
 Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.x. *This manual is as well in development*.
@@ -20,20 +20,41 @@ Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.
 
   * Users can create short scripts right within the config file.
 
-  * Effort has been made while making the most common application of lsyncd using rsync easy with default settings to keep lsyncd tidy as a general purpose file watching and action tool.
+  * Effort has been made while making the most common application of Lsyncd using rsync easy with default settings to keep lsyncd tidy as a general purpose file watching and action tool.
 
   * Retry on network error is now an integral part of Lsyncd.
 
   * Has exclude patterns that work.
 
-  * The new setting "statusfile" will instruct lsyncd to periodically write a report of its status in this file. E.g. amount of directories being watched, events in queue, actions in process etc.
+  * The new setting "statusfile" will instruct Lsyncd to periodically write a report of its status in this file. E.g. amount of directories being watched, events in queue, actions in process etc.
 
   * A good part of the Lsyncd daemon itself is now coded in Lua. 
+
+= Compiling Lsyncd =
+
+Building Lsyncd is a straight forward standard process for unix packages. Unpack the downloaded tar.gz-file and run:
+{{{
+./configure
+make
+sudo make install
+}}}
+
+When you grabbed the source directly from subversion run {{{./autogen}}} first.
+
+With this standard configuration the parts of Lsyncd written in Lua ("the runner") will be compiled into the binary. This results into a self-sufficient one-file binary. The runner can be left as external file with the {{{--with-runner=DIRECTORY}}} option. 
+
+== Coding Notices ==
+ ./autogen.sh
 
 = Commandline Options =
 
 = The Config File =
 
 = Developer Manual =
+
+When developing it is wise to configure lsyncd to use the runner in the development directory. So you do not have to rerun make everytime you change lsyncd.lua.
+{{{
+./configure --with-runner=/home/USER/lsyncd2/
+}}}
 
 == Why Lua and not ...? =
