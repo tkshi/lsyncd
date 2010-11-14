@@ -137,6 +137,7 @@ Additionally some parameters can be configured, which are inherited by all _Sync
 || maxDelays       || = || NUMBER || When this number of delayed events is queued. Action will be taken ||
 || maxProcesses    || = || NUMBER || Lysncd does not spawn more than these number of processes per sync ||
 
+
 == Layer 4 Configuration: Default Behaviour == 
 
 You can simply choose from a set of default configurations. There are currently two configs to choose from: __rsync__ and __rsyncssh__.
@@ -170,6 +171,20 @@ Example:
 {{{
 sync{source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOpts="-ltus"}
 }}}
+
+=== Exclusions ===
+Two additional parameters can be specified two sync{}
+|| excludeFrom     || = || FILENAME || loads exclusion rules from this file, on rule per line        ||
+|| exclude         || = || LIST     || loads exclusion rules from this list of strings      ||
+
+Exclusion rules are modeled after rsyncs exclussion patterns. Just a bit simpler. Lsyncd supports this features.
+
+ * Generally if any part of the pathname (see below Layer 3) of an event matches the text, it is excluded. E.g. the file "/bin/foo/bar" matches the rule "foo".
+ * If the rule starts with a slash, it will only be matched at the beginning of the pathname
+ * If the rule ends with a slash, it will only be matched at the end of a pathname
+ * ? matches any character that is not a slash.
+ * * matches zero or more characters that are not a slash
+ * ** matches zero or more characters, this can be slashes.
 
 == Layer 3 Configuration: Simple onAction Commands == 
 
@@ -551,6 +566,8 @@ MyClass = (function()
 end)()
 }}}
 In plain interpretation this creates a global variable called "MyClass". It defines an unnamed function with internal variables and subfunctions. This functions returns a table of all functions that should be visible from the outside. Then the unnamed function is called at the public interface table stored in "MyClass". {{{MyClass.new()}}} is then used to create objects of this class.
+
+One note about the style of sync{} configs. As you can see in Layer 4 configuration the configuration is selected by merely adding the configuration table as parameter. In the implementation it does nothing else than to take any value with a number as key and which has a table as value and copy all of its key/value entries that are not there already. This even works recursively if that config again imports another config. 
 
 == Why Lua and not ...? =
 Lua has been chosen for Lsyncd 2 much out of the same reasons why C was chosen for Lsyncd 1.x. Lsyncd should be small and fast and should come with as few as possible dependencies. 
