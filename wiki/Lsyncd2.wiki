@@ -365,7 +365,7 @@ action = function(inlet)
        config.source, config.target)
 }}}
 
-Inlet functions are
+Inlet functions are:
 || inlet.getEvent()  || Retrieves the next {{{event}}} as in Layer 2 configuration. Multiple calls to getEvent() will return the same event unless it has spawn{}ed an action. ||
 || inlet.getEvents(test) || Returns a list of all events that are ready. {{{test}}} is optional for a function that will be called for every event to test if it should be included in the list. It has one parameter the {{{event}}} and returns true if an event should be included. If nil every ready event will be included in the list ||
 || inlet.discardEvent() || Discards an event. The next call to getEvent will thus receive another event, even if no action has been spawned for this event ||
@@ -374,6 +374,15 @@ Inlet functions are
 || inlet.rmExclude()    || removes an exclusion pattern from this sync ||
 || inlet.createBlanketEvent() || puts an {{{event}}} on the top of the Delay FIFO that blocks all events and is blocked by all events. This is used for onStartup.  ||
 
+The list returned by getEvents can be handed to spawn{} as _agent_ just as well as singular events.
+
+Lists have following functions 
+|| elist.getPaths(delimiter)       || returns a string of the paths (as in {{{event.path}}} separated by {{{delimiter}}}. By default \n is user as delimiter. ||
+|| elist.getSourcePaths(delimiter) || returns a string of the sourcePaths (as in {{{event.sourcePath}}} separated by {{{delimiter}}}. By default \n is user as delimiter. ||
+
+Take care calling getEvents() and its function since depending on the amount of events, they will cause quite some CPU load.
+
+Layer 2 functions is nothing else than following layer 1 action loaded by the default if the user script did not provide one itself.
 
 {{{
 -----
