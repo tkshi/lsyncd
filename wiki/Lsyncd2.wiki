@@ -339,7 +339,15 @@ tattleMove = {
     end,
 }}}
 
-== Layer 1 Configuration:  == 
+A general tip about writing action function is to keep them short and fast. They are running right within Lsyncds one and only main thread. If you have to do any more time consuming calculations _spawn{}_ a child process instead. 
+
+There can only be one child process associated to a event.
+
+Layer 3 is nothing else than Lsyncd automatically write Layer 2 functions for you on initialization. Start lsyncd with {{{-log FWrite}}} on a Layer 3 configuration to see what functions it dynamically writes and loads for you. Thus Layer 3 and 2 can also be be mixed at will.
+
+== Layer 1 Configuration: Inlets == 
+
+
 
 = Examples =
 
