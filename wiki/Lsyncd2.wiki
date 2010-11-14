@@ -4,9 +4,9 @@
 Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.x. *This manual is as well in development*.
 
 = What's new in 2.0? =
-  * Lsyncd 2.x allows you to specify different actions for different kind of events. Particularly moves can now be implemented to be moved locally at the target instead of hitherto deletion of the source and retransfer of the destination.
+  * Lsyncd 2.x allows you to specify different actions for different kind of events. Particularly moves can now be implemented to be moved locally at the target instead of hitherto deletion of the origin and retransfer of the destination.
 
-  * Multiple events on one file or directory are still collapsed as in Lsyncd 1.33+. But lsyncd 2 tracking the kind of event collapses events logically. E.g. A _Create_ and a _Modify_ will be collapsed in a _Create_, a _Modify_ and a _Delete_ in a _Delete_, a _Create_ and a _Delete_ within the wait time as it often happens with temporary files will annihalte each other and result in Lsyncd doing nothing.
+  * Multiple events on one file or directory are still collapsed as in Lsyncd 1.33+. But Lsyncd 2 tracks the kind of event and collapses events logically. E.g. A _Create_ and a _Modify_ will be collapsed in a _Create_; a _Modify_ and a _Delete_ into a _Delete_; a _Create_ and a _Delete_ within the wait time (as it often happens with temporary files) will annihilate each other and result in Lsyncd not bothering the target at all.
 
   * Multiple targets now each have their own waiting list of events. A slow responding targets server no longer delays other targets.
 
@@ -45,6 +45,18 @@ With this standard configuration the parts of Lsyncd written in Lua ("the runner
 
 = Invoking Lsyncd =
 
+As any unix tool, lsyncd will print a synopsis of its command line options when called with --help. 
+{{{
+lsyncd --help
+lsyncd -help
+}}}
+By the way, the two hyphens are redundant for Lsyncd. It has no short one letter options, and one hyphen will always result into the same as specifying two.
+
+Also like most unix tools --version or -version will let it print out its version.
+{{{
+lsyncd -version
+}}}
+
 Lsyncd 2.0 is designed to be primarily configured through a config file (see below). The config file can thus be the only command line optin.
 {{{
 lsyncd CONFIGFILE
@@ -65,13 +77,39 @@ Two (and more) targets are configured by calling -rsync twice (or more).
 lsyncd -rsync /home/USER/src remotehost1:dst -rsync /home/USER/src remotehost2:dst 
 }}}
 
-A disadvantage with rsync synchronisation is that normally directory and file moves result in a deletion of the move origin and a retransfer of the move destination of the wire. A mean improvement of Lsyncd 2.0 it now can use ssh commands to move the directories and files locally on the target. To use this use {{{-rsyncssh}}} followed by the local source directory, the remote host and the destination directory there. The REMOTEHOST can include a user like {{{me@remotehost.com}}}.
+A disadvantage with rsync synchronization is that normally directory and file moves result in a deletion of the move origin and a retransfer of the move destination of the wire. A main improvement of Lsyncd 2.0 is, it now can use ssh commands to move the directories and files locally on the target. To use this use {{{-rsyncssh}}} followed by the local source directory, the remote host and the target directory there. The REMOTEHOST can include a user like {{{me@remotehost.com}}}.
 {{{
-lsyncd -rsyncssh /home/USER/src REMOTEHOST DESTDIR
+lsyncd -rsyncssh /home/USER/src REMOTEHOST TARGETDIR
 }}}
 
+When testing Lsyncd configurations {{{-nodaemon}}} is a pretty handy flag. With this lsyncd will not detach and become a daemon. All log messages are additionally to the configured logging facilities printed on the console (_stdout_ and _stderr_). 
+{{{
+lsyncd -nodaemon CONFIGFILE
+}}}
+Note there is a difference in behaviour. When running with -nodaemon, Lsyncd will not change its working directory to {{{/}}}, as it does when becoming a daemon. Thus relative targets like {{{./target}}} will work with {{{-nodaemon}}}, but must be specified to absolute paths to work in daemon mode. The source directories will also be turned into absolute paths by Lsyncd. The reason targets are not resolved to absolute paths while sources are is because Lsyncd itself does not care about the format of the target specifier which can also be remote hosts, rsyncd modules, etc. It is opaquely handed to rsync. It cares about the observed directories tough.
+
+By default Lsyncd is pretty scarce with logging message. All log messages are sorted in categories. You can turn Lsyncd into a motormouth by specifying {{{-log all}}}.
+{{{
+lsyncd -log all CONFIGFILE
+}}}
+
+This might easily become too much tough. A particularly useful category might be "Exec" which will log the command lines of all processes Lsyncd spawns
+{{{
+lsyncd -log Exec CONFIGFILE
+}}}
+
+Part of lsyncd is written in Lua. By default it is directly compiled into the binary, but can be configured at compiletime and runtime to be loaded from a file as well. To see where the a lsyncd binary will draw its runner from, just call it with {{-runner}}:
+{{{
+lsyncd -runner
+}}}
+
+You can override the default Lsyncd runner with adding a file:
+{{{
+lsyncd -runner RUNNERFILE
+}}}
 
 = The Configuration File =
+
 
 = Examples =
 
