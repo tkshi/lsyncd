@@ -244,11 +244,9 @@ Any action starting with a "/" result in the binary starting at the beginning di
 }}}
 will add any newly created and modified files to /usr/var/all.zip using absolute path names. Any action not starting with a "/" will result in Lsyncd spawning a shell to execute the action as command. For example see above.
 
-Variable arguments are spe
+Variable arguments are specified with the caret symbol ^. It has been chosen over $ or other symbols to be less conflicting with standard shell conventions. 
 
-        { "%^pathname"cified with the caret symbol. It has been chosen over $ or other symbols to be less conflicting with standard shell conventions. 
-
-All possible variables
+All possible variables:
 
 || ^source || The absolute path of the observed source directory. ||
 || ^target || The "target" attribute of the config.               ||
@@ -421,7 +419,9 @@ action = function(inlet)
 end,
 }}}
 
-Other than action Lsyncd calls {{{init}}} for each sync{}. This is the default init function which provides the onStartup() functionality of layer 2.
+Lsyncd will automatically split Move events into Create and Delete events if no "onMove" field is found in the config. When handling moves in layer 1 {{{action}}} function, simply set "onMove" to be "true". 
+
+Other than {{{action}}} Lsyncd calls {{{init}}} for each sync{} on initialization. This is the default init function which is loaded if the user script does not have one. It provides the onStartup() functionality for layer 2 and 3.
 
 {{{
 -----
