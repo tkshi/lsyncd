@@ -171,7 +171,7 @@ Example:
 sync{source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOpts="-ltus"}
 }}}
 
-== Layer 3 Configuration: simple onAction Commands == 
+== Layer 3 Configuration: Simple onAction Commands == 
 
 In this layer custom configuration can created. This example will use bash commands to keep a local directory in Sync.
 
@@ -189,7 +189,7 @@ bash = {
 
     onMove   = "mv ^o.targetPathname ^d.targetPathname",
 
-    onStartup = [[if [ "$(ls -A $1)" ]; then cp -r ^source* ^target; fi]],
+    onStartup = [[if [ "$(ls -A ^source)" ]; then cp -r ^source* ^target; fi]],
 }
 }}}
 
@@ -251,10 +251,66 @@ From the example above, it moves the file or directory in the target directory.
     onMove   = "mv ^o.targetPathname ^d.targetPathname",
 }}}
 
+A few word on the startup of the example. It looks a little more complicated, but it is just some bash scripting, nothing Lsyncd specifc. It simply does a recursive copy of the source to the target, but first tests if there is anything in the sourcefile. Otherwise the command returns a non-zero error code.
 
-== Layer 2 Configuration == 
+{{{
+    onStartup = [[if [ "$(ls -A ^source)" ]; then cp -r ^source* ^target; fi]],
+}}}
 
-== Layer 1 Configuration == 
+By default Lsyncd ignores all exitcodes except onStartup which must result a 0 for it to continue. You can change this behavior by adding a {{{exitcodes}}} table.
+
+{{{
+    exitcodes = {[1] = "again", [2] = "die"}
+}}}
+The keys specify the exitcode the string the action. 
+|| "again" || respawns the action after {{delay}} seconds, or 1 second if delay is immediate ||
+|| "die"  || lets Lsyncd terminate. ||
+All other values let Lsyncd continue normally.
+
+== Layer 2 Configuration: Advanced onAction Commands == 
+
+Instead of designating actions as strings as in Layer 3 Lua functions can used to do some small scripts right within Lsyncd.
+
+This example will convert any convert any file with the suffix ".ps" created in a directory into a pdf.
+
+{{{
+autopdf = {
+    onCreate = function(event)
+        log("Normal", "got an onCreate Event")
+        if string.ends(event.pathname, ".ps") then
+            spawn(event, "/usr/bin/ps2pdf", event.sourcePath)
+        end
+    end,
+}}}
+
+The function can take any valid Lua code. 
+
+Lsyncd provides you a set of functions to be used in user scripts.
+
+==== log(Category, ...) ====
+Logs a message into file/stdout/syslog. The first parameter is the logging category all others are strings to be logged. A logging category must start with a capital letter. "Normal" and "Error" are standard categories for log messages. All others are categories for debugging.
+
+==== spawn(Event, Binary, ...) ====
+Spawns a new process associated with the event (or event list, see below) as first parameter. The second parameter specifies to binary to call. All others are arguments for the binary. 
+
+If the third parameter is "<" it and the forth will not be passed as argument to the binary. The forth parameter is a string that will piped through stdin to the binary.
+
+Do not use Luas {{{os.execute}}} as differently to Lsyncds {{{spawn()}}} it will block an thus block the whole Lsyncd daemon until the command is completed. Lsyncds {{{spawn}}} on the other hand returns immediately while the child process runs.
+
+===== spawnShell(Event, Command, ... ) =====
+The same as spawn(), only it will invoke a shell. Any parameters are referred as $1, $2, $3 and so on in the command. 
+
+By the way, this is the simple implementation of spawnShell:
+{{{
+function spawnShell(agent, command, ...)
+    return spawn(agent, "/bin/sh", "-c", command, "/bin/sh", ...)
+end
+}}}
+
+===== terminate(exitcode) =====
+Lets Lsyncd terminate with {{{{exitcode}}}}.
+
+== Layer 1 Configuration:  == 
 
 = Examples =
 
@@ -264,6 +320,8 @@ When developing it is wise to configure Lsyncd to load the runner from your deve
 {{{
 ./configure --with-runner=/home/USER/lsyncd2/
 }}}
+
+== Roadmap ==
 
 == Why Lua and not ...? =
 x
