@@ -47,14 +47,14 @@ With this standard configuration the parts of Lsyncd written in Lua (the runner)
 
 = Invoking Lsyncd =
 
-As any unix tool, lsyncd will print a synopsis of its command line options when called with --help. 
+As any unix tool, Lsyncd will print a synopsis of its command line options when called with --help. 
 {{{
 lsyncd --help
 lsyncd -help
 }}}
-By the way, the two hyphens are redundant for Lsyncd. It has no short one letter options, and one hyphen will always result into the same as specifying two.
+By the way, the two hyphens are redundant for Lsyncd. It has no short one letter options and one hyphen will always result into the same as specifying two.
 
-Also like most unix tools --version or -version will let it print out its version.
+Also like any unix tools --version or -version will let it print its version number.
 {{{
 lsyncd -version
 }}}
