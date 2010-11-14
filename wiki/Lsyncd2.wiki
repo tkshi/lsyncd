@@ -447,273 +447,60 @@ init = function(inlet)
 end,
 }}}
 
+When child processes are finished and their zombie processes are collected, Lsyncd calls the function of the {{{collect}}} entry. When collect return "again" the status of the agent (an event or an event list) will be set on "wait" again, and will become ready in {{{delay}}} seconds (or 1 second if smaller).
+
+The default collect function looks in the exitcodes[] table for an entry of the exitcode. Otherwise most of the unfortunately longer code below does nothing but making nice log message.
+
+{{{
+-----
+-- Called when collecting a finished child process
+--
+collect = function(agent, exitcode)
+	local config = agent.config
+
+	if not agent.isList and agent.etype == "Blanket" then
+		if exitcode == 0 then
+			log("Normal", "Startup of '",agent.source,"' finished.")
+		elseif config.exitcodes and 
+		       config.exitcodes[exitcode] == "again" 
+		then
+			log("Normal", 
+				"Retrying startup of '",agent.source,"'.")
+			return "again"
+		else
+			log("Error", "Failure on startup of '",agent.source,"'.")
+			terminate(-1) -- ERRNO
+		end
+		return
+	end
+
+	local rc = config.exitcodes and config.exitcodes[exitcode] 
+	if rc == "die" then
+		return rc
+	end
+
+	if agent.isList then
+		if rc == "again" then
+			log("Normal", "Retrying a list on exitcode = ",exitcode)
+		else
+			log("Normal", "Finished a list = ",exitcode)
+		end
+	else
+		if rc == "again" then
+			log("Normal", "Retrying ",agent.etype,
+				" on ",agent.sourcePath," = ",exitcode)
+		else
+			log("Normal", "Finished ",agent.etype,
+				" on ",agent.sourcePath," = ",exitcode)
+		end
+	end
+	return rc
+end,
+}}}
+
 = Examples =
 
-== Autoconvert ==
-This is a layer 1 script to make a special "magic" directory in which image files will be converted automatically therein. 
-
-The full script:
-
-{{{
-local formats = { jpg=true, gif=true, png=true,  }
-
-convert = {
-	delay = 0,
-
-	maxProcesses = 99,
-
-	action = function(inlet)
-		local event = inlet.getEvent()
-
-		if event.isdir then
-			-- ignores events on dirs
-			inlet.discardEvent(event)
-			return
-		end
-
-		-- extract extension and basefilename
-		local p    = event.pathname
-		local ext  = string.match(p, ".*%.([^.]+)$")
-		local base = string.match(p, "(.*)%.[^.]+$")
-		if not formats[ext] then
-			-- an unknown extenion
-			log("Normal", "not doing something on ."..ext)
-			inlet.discardEvent(event)
-			return
-		end
-
-		-- autoconvert on create and modify
-		if event.etype == "Create" or event.etype == "Modify" then
-			-- builds one bash command
-			local cmd = ""
-			-- do for all other extensions
-			for k, _ in pairs(formats) do
-				if k ~= ext then
-					-- excludes files to be created, so no
-					-- followup actions will occur
-					inlet.addExclude(base..'.'..k)
-					if cmd ~= ""  then
-						cmd = cmd .. " && "
-					end
-					cmd = cmd.. 
-						'/usr/bin/convert "'..
-						event.source..p..'" "'..
-						event.source..base..'.'..k..
-						'" || /bin/true'
-				end
-			end
-			log("Normal", "Converting "..p)
-			spawnShell(event, cmd)
-			return
-		end
-		
-		-- deletes all formats if you delete one
-		if event.etype == "Delete" then
-			-- builds one bash command
-			local cmd = ""
-			-- do for all other extensions
-			for k, _ in pairs(formats) do
-				if k ~= ext then
-					-- excludes files to be created, so no
-					-- followup actions will occur
-					inlet.addExclude(base..'.'..k)
-					if cmd ~= ""  then
-						cmd = cmd .. " && "
-					end
-					cmd = cmd..
-						'rm "'..event.source..base..'.'..k..
-						'" || /bin/true'
-				end
-			end
-			log("Normal", "Deleting all "..p)
-			spawnShell(event, cmd)
-			return
-		end
-
-		-- ignores other events.
-		inlet.discardEvent(event)
-	end,
-
-	-----
-	-- Removes excludes when convertions are finished
-	--
-	collect = function(event, exitcode)
-		local p     = event.pathname
-		local ext   = string.match(p, ".*%.([^.]+)$")
-		local base  = string.match(p, "(.*)%.[^.]+$")
-		local inlet = event.inlet
-
-		if event.etype == "Create" or
-		   event.etype == "Modify" or 
-		   event.etype == "Delete" 
-		then
-			for k, _ in pairs(formats) do
-				inlet.rmExclude(base..'.'..k)
-			end
-		end
-	end,
-
-}
-
-sync{convert, source="magicdir", recursive=false}
-}}}
-
-
-This creates a local table of all supported file formats. The file formats are used as keys.
-{{{
-local formats = { jpg=true, gif=true, png=true,  }
-}}}
-
-Configures actions to be instant and there is unlimits the amount the conversion to be done at once. Well not unlimited but set the limit pretty high.
-{{{
-convert = {
-	delay = 0,
-
-	maxProcesses = 99,
-}}}
-
-This script uses the _layer 1_ inlet interface altough it greps only single interfaces. It does this instead of _layer 2_ as it needs to do common operations for all kind of events.
-{{{
-	action = function(inlet)
-		local event = inlet.getEvent()
-}}}
-
-Ignores directories. As using _layer 1_ it has to explicitly discard events it does not spawn actions for.
-{{{
-		if event.isdir then
-			-- ignores events on dirs
-			inlet.discardEvent(event)
-			return
-		end
-}}}
-
-Uses Lua string patterns to extract the file extension from the rest - here called base.
-{{{
-		-- extract extension and basefilename
-		local p    = event.pathname
-		local ext  = string.match(p, ".*%.([^.]+)$")
-		local base = string.match(p, "(.*)%.[^.]+$")
-}}}
-
-Looks the extension up in the formats table. This can be done, since formats are keys in that table. If not an image format it bails out.
-{{{
-		if not formats[ext] then
-			-- an unknown extenion
-			log("Normal", "not doing something on ."..ext)
-			inlet.discardEvent(event)
-			return
-		end
-}}}
-
-Following actions will done on "Create" and "Modify" events.
-{{{
-		-- autoconvert on create and modify
-		if event.etype == "Create" or event.etype == "Modify" then
-}}}
-
-This script builds a bash command using a string. And 
-{{{
-			-- builds one bash command
-			local cmd = ""
-}}}
-
-It iterates for all image formats and excludes the one which is the source image.
-{{{
-			-- do for all other extensions
-			for k, _ in pairs(formats) do
-				if k ~= ext then
-}}}
-
-This is a little trick. It creates Exclusions for the converted images. As this images are not placed in a target directory but right next to the source image in the source directory they would otherwise trigger Create actions as well.
-{{{
-					-- excludes files to be created, so no
-					-- followup actions will occur
-					inlet.addExclude(base..'.'..k)
-}}}
-
-And for every image to be converted adds the calls to the arguments. It uses { || /bin/true } to let the shell continue if one conversion fails. In that it chains the conversion with '&&' they will be called sequentially.
-{{{
-					if cmd ~= ""  then
-						cmd = cmd .. " && "
-					end
-					cmd = cmd.. 
-						'/usr/bin/convert "'..
-						event.source..p..'" "'..
-						event.source..base..'.'..k..
-						'" || /bin/true'
-}}}
-
-And eventually it spawns the shell doing the conversions and is finished.
-{{{
-				end
-			end
-			log("Normal", "Converting "..p)
-			spawnShell(event, cmd)
-			return
-		end
-}}}		
-
-For deletions it does technically something similar, but it deletes all other file formats of the image.
-{{{
-		-- deletes all formats if you delete one
-		if event.etype == "Delete" then
-			-- builds one bash command
-			local cmd = ""
-			-- do for all other extensions
-			for k, _ in pairs(formats) do
-				if k ~= ext then
-					-- excludes files to be created, so no
-					-- followup actions will occur
-					inlet.addExclude(base..'.'..k)
-					if cmd ~= ""  then
-						cmd = cmd .. " && "
-					end
-					cmd = cmd..
-						'rm "'..event.source..base..'.'..k..
-						'" || /bin/true'
-				end
-			end
-			log("Normal", "Deleting all "..p)
-			spawnShell(event, cmd)
-			return
-		end
-}}}
-
-and not to forget to nicely discard all other events.
-{{{
-		-- ignores other events.
-		inlet.discardEvent(event)
-	end,
-}}}
-
-collect is called when the conversions finished. It will remove the temporary excludes again.
-{{{
-	-----
-	-- Removes excludes when convertions are finished
-	--
-	collect = function(event, exitcode)
-		local p     = event.pathname
-		local ext   = string.match(p, ".*%.([^.]+)$")
-		local base  = string.match(p, "(.*)%.[^.]+$")
-		local inlet = event.inlet
-
-		if event.etype == "Create" or
-		   event.etype == "Modify" or 
-		   event.etype == "Delete" 
-		then
-			for k, _ in pairs(formats) do
-				inlet.rmExclude(base..'.'..k)
-			end
-		end
-	end,
-}}}
-
-And finally use the configuration to watch "magicdir".
-
-{{{
-sync{convert, source="magicdir", recursive=false}
-}}}
-
+For a full custom layer 1 script see: AutoImageMagic
 
 = Developer Manual =
 
@@ -724,4 +511,23 @@ When developing it is wise to configure Lsyncd to load the runner from your deve
 
 == Roadmap ==
 
+Lsycnd 2.0 release 
+* man pages 
+* an automatic testsuite like lsyncd 1.x has (some unit tests)
+* user feedback on beta releases
+
+While work could go on, there is a moment to call things pause and postpone some work to later.
+
+Lsyncd 2.1+: (any future versions)
+* Optimization of the _Delay_ construct. Lsyncd goes a few times linearly through its delay Fifo where it would not have to. Code it as Queue and use pathnames as hashtables to quickly find blocks.
+* fanotify support - brand new in linux 2.6.36, supercedes inotify and using this saves a lot of kernel memory if watching big source dirs.
+* fsevents support - similar to i/fanotify, but on OS X 
+* support for includes, currently only masks for excludes are supported.
+* Supposedly tons of bug fixes to Lsyncd 2.0(betaX)
+
 == Why Lua and not ...? =
+Lua has been chosen for Lsyncd 2 much out of the same reasons why C was chosen for Lsyncd 1.x. Lsyncd should be small and fast and should come with as few as possible dependencies. 
+
+The move from a pure C implementation as in Lsyncd 1.x to using Lua was motivated by enhancing the configuration file format. XML was starting to get clunky for the requirements of Lsyncd. When used Lua bindings already for config file parsing, there was little reason not to move large parts of Lsyncd internal logic into Lua as well. With its garbage collector memory management became much easier, and with its highly optimized tables as dictionaries some things even become faster, as Lsyncd 1.x linearly traversed a lot of lists, while Lsyncd 2 uses Lua tables as hash tables everywhere. 
+
+Lua was chosen over other script languages not because I think Lua is the greatest thing on earth - like many coders think about their favorite language. But because it is considered to be a appropriate tool for this task. Many coders like [X] so much, they want to do everything with it, also because after a while they know [X] very well, and are of course faster in solving an issue than learning [Y]. I on the other hand didn't know Lua before Lsyncd 2 at all, and decided explicitly for it out of pragmatic reasons. First it is said have originated out of the need for configuration files for C applications. Much the use case Lsyncd needs. So the C interface is handy and fast. Since Lsyncd has its parts close to the system still coded in C this interfacing makes things easier. Lua is very fast. Without affronting other script languages one can say it is at least in the top tier regarding speed. It may the fastest scripts there is, but this statement might raise debates. But not without reason it got quite some attention from the gaming industry. It gets even faster with LuaJIT and is gets into the range of JavaJIT (which is a compiled and not a script language). Lua has also a very slim standard library, while this is a stopper for people just wanting to quickly write some script this plays into the hands of Lsyncd. It comes with little requirements on the machine to be installed and Lsyncd comes with its own custom core functionally anyway. And altough the LUA syntax looks a bit dirty at first - like implicit on the fly creation of globals - with a little configuration this can be banned. Like Lsyncd does in normal operation modes. 
