@@ -529,9 +529,9 @@ When developing it is wise to configure Lsyncd to load the runner from your deve
 == Roadmap ==
 
 Lsycnd 2.0 release 
-* man pages 
-* an automatic testsuite like lsyncd 1.x has (some unit tests)
-* user feedback on beta releases
+ * man pages 
+ * an automatic testsuite like lsyncd 1.x has (some unit tests)
+ * user feedback on beta releases
 
 While work could go on, there is a moment to call things pause and postpone some work to later.
 
