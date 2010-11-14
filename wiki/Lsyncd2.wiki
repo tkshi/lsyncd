@@ -39,16 +39,41 @@ make
 sudo make install
 }}}
 
-When you grabbed the source directly from subversion run {{{./autogen}}} first.
+When you grabbed the source directly from subversion run {{{./autogen.sh}}} first.
 
 With this standard configuration the parts of Lsyncd written in Lua ("the runner") will be compiled into the binary. This results into a self-sufficient one-file binary. The runner can be left as external file with the {{{--with-runner=DIRECTORY}}} option. 
 
-== Coding Notices ==
- ./autogen.sh
+= Invoking Lsyncd =
 
-= Commandline Options =
+Lsyncd 2.0 is designed to be primarily configured through a config file (see below). The config file can thus be the only command line optin.
+{{{
+lsyncd CONFIGFILE
+}}}
 
-= The Config File =
+Altough for standard use or quick testing it can be cursorily facilely configured by commandline. This will keep a local src and dst directory in sync using rsync.
+{{{
+lsyncd -rsync /home/USER/src /home/USER/dst
+}}}
+
+The target can here be anything that rsync recognizes.
+{{{
+lsyncd -rsync /home/USER/src remotehost:dst
+}}}
+
+Two (and more) targets are configured by calling -rsync twice (or more).
+{{{
+lsyncd -rsync /home/USER/src remotehost1:dst -rsync /home/USER/src remotehost2:dst 
+}}}
+
+A disadvantage with rsync synchronisation is that normally directory and file moves result in a deletion of the move origin and a retransfer of the move destination of the wire. A mean improvement of Lsyncd 2.0 it now can use ssh commands to move the directories and files locally on the target. To use this use {{{-rsyncssh}}} followed by the local source directory, the remote host and the destination directory there. The REMOTEHOST can include a user like {{{me@remotehost.com}}}.
+{{{
+lsyncd -rsyncssh /home/USER/src REMOTEHOST DESTDIR
+}}}
+
+
+= The Configuration File =
+
+= Examples =
 
 = Developer Manual =
 
