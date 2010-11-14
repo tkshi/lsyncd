@@ -183,8 +183,8 @@ Exclusion rules are modeled after rsyncs exclussion patterns. Just a bit simpler
  * If the rule starts with a slash, it will only be matched at the beginning of the pathname
  * If the rule ends with a slash, it will only be matched at the end of a pathname
  * ? matches any character that is not a slash.
- * * matches zero or more characters that are not a slash
- * ** matches zero or more characters, this can be slashes.
+ * {{{*}}} matches zero or more characters that are not a slash
+ * {{{**}}} matches zero or more characters, this can be slashes.
 
 == Layer 3 Configuration: Simple onAction Commands == 
 
