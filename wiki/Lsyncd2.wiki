@@ -404,6 +404,49 @@ action = function(inlet)
 end,
 }}}
 
+Other than action Lsyncd calls {{{init}}} for each sync{}. This is the default init function which provides the onStartup() functionality of layer 2.
+
+{{{
+-----
+-- called on (re)initalizing of lsyncd.
+--
+init = function(inlet)
+    local config = inlet.getConfig()
+    -- calls a startup if provided by user script.
+    if type(config.onStartup) == "function" then
+        local event = inlet.createBlanketEvent()
+        config.onStartup(event)
+        if event.status == "wait" then
+            -- user script did not spawn anything
+            -- thus the blanket event is deleted again.
+            inlet.discardEvent(event)
+        end 
+    end 
+end,
+}}}
+
+As another example this init of {{{default.rsync}}}. As specialty it the configuration in that it adds a slash to target if not there already.
+
+{{{
+-----
+-- Spawns the recursive startup sync
+-- 
+init = function(inlet)
+    local config = inlet.getConfig()
+    local event = inlet.createBlanketEvent()
+    if string.sub(config.target, -1) ~= "/" then
+        config.target = config.target .. "/" 
+    end 
+    log("Normal", "recursive startup rsync: ", config.source,
+        " -> ", config.target)
+    spawn(event, "/usr/bin/rsync", 
+        "--delete",
+        config.rsyncOps .. "r", 
+        config.source, 
+        config.target)
+end,
+}}}
+
 = Examples =
 
 = Developer Manual =
