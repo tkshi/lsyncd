@@ -161,8 +161,81 @@ Example:
 sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOpts="-ltus"}
 }}}
 
+==== default.rsyncssh ====
+This configuration differs from standard rsync in that it uses ssh commands to move files or directory locally at the target instead of transfering them over the wire. This configuration does spawn rsyncs like default.ssh but additionally will spawn {{{/usr/bin/ssh HOST mv ORIGIN DESTINATION}} commands. Per default it waits up to 10 seconds and will spawn up to 10 synchronous processes.
+
+Different to default.rsync it does not take an uniform {{{target}}} parameter, but needs {{{host}}} and {{{targetdir}}} separated. Again rsync short options can be changed with {{{rsyncOpts}}}
+
+Example:
+{{{
+sync{source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOpts="-ltus"}
+}}}
 
 == Layer 3 Configuration == 
+
+In this layer custom configuration can created. This example will use bash commands to keep a local directory in Sync.
+
+{{{
+bash = {
+    delay = 5,
+
+    maxProcesses = 3,
+
+    onCreate = "cp -r ^sourcePathname ^targetPathname",
+
+    onModify = "cp -r ^sourcePathname ^targetPathname",
+
+    onDelete = "rm -rf ^targetPathname",
+
+    onMove   = "mv ^o.targetPathname ^d.targetPathname",
+
+    onStartup = [[if [ "$(ls -A $1)" ]; then cp -r ^source* ^target; fi]],
+}
+}}}
+
+The example explained step by step. Technically any Lsyncd configuration a lua table with a set of keys filled out. Thus it starts by creating a variable called {{{bash}}} and assigns it a table with = { ... }.
+
+{{{
+bash = {
+  ...
+}
+}}}
+
+Now the table is filled with entries. Every entry having a key left of the equal sign and its value right of it. If no delay is specified this means immediate actions for Lsyncd. This example wants to aggregate changes for 5 seconds thus the next entry is:
+{{{
+    delay = 5,
+}}}
+And a comma is needed since to mark the end of an entry.
+
+Actions are specified by the 6 keys: 
+
+|| {{{onAttrib}}}  || called when only attributes changed              ||
+|| {{{onCreate}}}  || called on a new file or directory                ||
+|| {{{onModify}}}  || called when a file has changed                   ||
+|| {{{onDelete}}}  || called when a file or directory has been deleted ||
+|| {{{onMove}}}    || called when a file or directory has been moved within the observed directory tree ||
+|| {{{onStartup}}} || called on the start of Lsyncd.                   ||
+
+When there is no {{{onMove}}} or the move goes into or out of the observed directory tree, it is split into a {{{onDelete}}} of the move origin and a {{{onCreate}}} of the move destination. That is if either is within the observer directory tree.
+
+{{{onStartup}}} will always block all other actions for this _Sync_ until completed, regardless how big {{{maxProcesses}}} is.
+
+The action to be taken is specified as a Lua String. 
+
+ {{{onCreate}}}, {{{onModify}}}, {{{onDelete}}}, {{{onMove}}} and {{{onStartup}}}.
+
+    onCreate = "cp -r ^sourcePathname ^targetPathname",
+
+    onModify = "cp -r ^sourcePathname ^targetPathname",
+
+    onDelete = "rm -rf ^targetPathname",
+
+    onMove   = "mv ^o.targetPathname ^d.targetPathname",
+
+    onStartup = [[if [ "$(ls -A $1)" ]; then cp -r ^source* ^target; fi]],
+
+There are 5 
+
 
 == Layer 2 Configuration == 
 
