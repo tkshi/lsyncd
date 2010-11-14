@@ -116,16 +116,16 @@ Lsyncd configurations files are valid [http://www.lua.org/ Lua syntax]. It is de
 
 == Settings ==
 
-For scripts of all layers, with the global variable {{{settings}}} daemon wide configurations can be specified. Every settings has to have a key and value. 
+For scripts of all layers, with the global variable {{{settings}}} daemon-wide configurations can be specified. Every settings has to have a key and value. 
 
-For example following code will tell Lsyncd to log into {{{/tmp/lsyncd.log}}}, periodically update the file {{{/tmp/lsyncd.status}}} with its status and to not detach as daemon.
+For example following code will instruct Lsyncd to log into {{{/tmp/lsyncd.log}}}, periodically update the file {{{/tmp/lsyncd.status}}} with its status and to not detach as a daemon.
 {{{
-settings = 
+settings = {
    logfile    = "/tmp/lsyncd.log",
    statusFile = "/tmp/lsyncd.status",
    nodaemon   = true,
+}
 }}}
-
 
 Valid keys for settings are:
 || logfile         || = || FILENAME || logs into this file                         ||
@@ -134,13 +134,13 @@ Valid keys for settings are:
 || statusIntervall || = || NUMBER   || writes the status file at shortest every Number seconds ||
 
 Additionally some parameters can be configured, which are inherited by all _Syncs_ (see Layer 3)
-|| maxDelays       || = || NUMBER || When this number of delayed events is queued. Action will be taken ||
+|| maxDelays       || = || NUMBER || When this amount of delayed events is queued, actions will be spawned, even below the delay timer. ||
 || maxProcesses    || = || NUMBER || Lysncd does not spawn more than these number of processes per sync ||
 
 
 == Layer 4 Configuration: Default Behaviour == 
 
-You can simply choose from a set of default configurations. There are currently two configs to choose from: __rsync__ and __rsyncssh__.
+You can simply choose from a set of default configurations. There are currently two default configs to choose from: __rsync__ and __rsyncssh__.
 
 To sync a local directory using default rsync behaviour just add this to a config file:
 {{{
