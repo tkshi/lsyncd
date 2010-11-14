@@ -1,4 +1,5 @@
 #summary Manual to Lsyncd Version 2.x.
+<wiki:toc max_depth="2" />
 
 = Introduction =
 Lsyncd version 2.0 is currently in development as a complete recode of Lsyncd 1.x. *This manual is as well in development*.
