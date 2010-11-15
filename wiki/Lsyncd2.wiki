@@ -26,7 +26,7 @@ Lsyncd version 2.0 is currently at beta1 as a complete recode of Lsyncd 1.x. *Th
 
   * Retry on network error is now an integral part of Lsyncd.
 
-  * Has exclude patterns that work.
+  * Has improved exclude patterns.
 
   * The new setting "statusfile" will instruct Lsyncd to periodically write a report of its status in this file. E.g. amount of directories being watched, events in queue, actions in process etc.
 
