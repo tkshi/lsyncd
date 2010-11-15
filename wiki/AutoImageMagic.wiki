@@ -62,7 +62,7 @@ convert = {
 			-- do for all other extensions
 			for k, _ in pairs(formats) do
 				if k ~= ext then
-					-- excludes files to be created, so no
+					-- excludes files to be deleted, so no
 					-- followup actions will occur
 					inlet.addExclude(base..'.'..k)
 					if cmd ~= ""  then
@@ -120,7 +120,7 @@ convert = {
 	maxProcesses = 99,
 }}}
 
-This script uses the _layer 1_ inlet interface altough it greps only single interfaces. It does this instead of _layer 2_ as it needs to do common operations for all kind of events.
+This script uses the _layer 1_ inlet interface altough it greps only single events and not lists. It does this instead of _layer 2_ as it needs to do common operations for all kind of events.
 {{{
 	action = function(inlet)
 		local event = inlet.getEvent()
@@ -210,7 +210,7 @@ For deletions it does technically something similar, but it deletes all other fi
 			-- do for all other extensions
 			for k, _ in pairs(formats) do
 				if k ~= ext then
-					-- excludes files to be created, so no
+					-- excludes files to be deleted, so no
 					-- followup actions will occur
 					inlet.addExclude(base..'.'..k)
 					if cmd ~= ""  then
@@ -256,7 +256,7 @@ collect is called when the conversions finished. It will remove the temporary ex
 	end,
 }}}
 
-And finally use the configuration to watch "magicdir".
+And finally use the configuration to watch "magicdir". 
 
 {{{
 sync{convert, source="magicdir", recursive=false}
