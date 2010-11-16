@@ -516,7 +516,14 @@ end,
 }}}
 
 = Examples =
+== Layer 4 Examples ==
 
+== Layer 3 Examples ==
+
+== Layer 2 Examples ==
+[ExampleGForce Force a local directorytree to be read/writeable by a group.] 
+
+== Layer 1 Examples ==
 For a full custom layer 1 script see: AutoImageMagic
 
 = Developer Manual =
