@@ -519,12 +519,12 @@ end,
 == Layer 4 Examples ==
 
 == Layer 3 Examples ==
-
-== Layer 2 Examples ==
  * [ExampleGForce Forces a local directorytree to be read/writeable by a group.] 
 
+== Layer 2 Examples ==
+
 == Layer 1 Examples ==
- * [AutoImageMagic Create a "magic" directory in which all images placed into will be converted to other file formats]
+ * [ExampleAutoImageMagic Creates a "magic" directory in which all images placed into will be converted to other file formats]
 
 = Developer Manual =
 
