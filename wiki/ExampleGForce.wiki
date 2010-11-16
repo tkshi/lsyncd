@@ -1,4 +1,5 @@
-#summary A Layer 3 example that force a directory to be read/writeable by a group.
+#summary A Layer 3 example that forces a directorytree to be read/writeable by a group.
+#labels Example,Layer3
 
 {{{
 -----
