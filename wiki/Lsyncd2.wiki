@@ -8,7 +8,7 @@ Lsyncd version 2.0 is currently at beta1 as a complete recode of Lsyncd 1.x. *Th
 = What's new in 2.0? =
   * Lsyncd 2.x allows you to specify different actions for different kind of events. Particularly moves can now be implemented to be moved locally at the target instead of hitherto deletion of the origin and retransfer of the destination.
 
-  * Multiple events on one file or directory are still collapsed as in Lsyncd 1.33+. But Lsyncd 2 tracks the kind of event and collapses events logically. E.g. A _Create_ and a _Modify_ will be collapsed in a _Create_; a _Modify_ and a _Delete_ into a _Delete_; a _Create_ and a _Delete_ within the wait time (as it often happens with temporary files) will annihilate each other and result in Lsyncd not bothering the target at all.
+  * Multiple events on one file or directory are still collapsed as in Lsyncd 1.33+. But Lsyncd 2 tracks the kind of event and collapses events logically. E.g. A _Create_ and a _Modify_ will be collapsed in a _Create_; a _Modify_ and a _Delete_ into a _Delete_; etc.
 
   * Multiple targets now each have their own waiting list of events. A slow responding targets server no longer delays other targets.
 
