@@ -1,60 +1,44 @@
-AUTOMAKE_OPTIONS = foreign
-CFLAGS += -Wall $(LUA_CFLAGS) 
+## Makefile.am -- Process this file with automake to produce Makefile.in
 bin_PROGRAMS = lsyncd
-lsyncd_SOURCES = lsyncd.h lsyncd.c lsyncd.lua
-#if INOTIFY
-lsyncd_SOURCES += inotify.c
-#endif
-#if FANOTIFY
-#lsyncd_SOURCES += fanotify.c
-#endif
+lsyncd_SOURCES = lsyncd.c 
+TESTS = tests/help.sh \
+	tests/directorycpr.sh \
+	tests/directorycpr0.sh \
+	tests/directorymv.sh \
+	tests/pidfile.sh \
+	tests/version.sh \
+	tests/wrong-logfile.sh \
+	tests/wrong-rsync.sh
 
-#if FSEVENTS
-#lsyncd_SOURCES += fsevents.c
-#endif
+datarootdir = @datarootdir@
 
-lsyncd_LDADD = $(LUA_LIBS)
-exampledir = $(datarootdir)/doc/@PACKAGE@
-dist_example_DATA = \
-	examples/lbash.lua \
-	examples/lecho.lua \
-	examples/lgforce.lua \
-	examples/limagemagic.lua \
-	examples/lrsync.lua \
-	examples/lrsyncssh.lua
-TESTS = tests/l4-rsync-data.sh
+EXTRA_DIST = config.h.in inotify-nosys.h lsyncd.conf.xml \
+	doc/manpage.lsyncd.xml doc/manpage.lsyncd.conf.xml \
+	doc/lsyncd.1 doc/lsyncd.conf.xml.5
 
-dist_man1_MANS = doc/lsyncd.1
-EXTRA_DIST = doc/lsyncd.1.txt doc/lsyncd.1.xml
+nodist_man1_MANS = doc/lsyncd.1
+nodist_man5_MANS = doc/lsyncd.conf.xml.5
 
-doc/lsyncd.1: doc/lsyncd.1.xml
-	xsltproc -o $@ -nonet /etc/asciidoc/docbook-xsl/manpage.xsl $<
+check-syntax:
+	$(CC) -c -O2 -Wall $(CHK_SOURCES)  -o/dev/null 
 
-doc/lsyncd.1.xml: doc/lsyncd.1.txt
-	asciidoc -o $@ -b docbook -d manpage $<
+DB2MAN = /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl
+XP     = xsltproc -''-nonet \
+          -''-param man.charmap.use.subset "0" \
+          -''-param make.year.ranges "1" \
+          -''-param make.single.year.ranges "1"
 
-if RUNNER
-# installs the runner script
-runnerdir = $(RUNNER_DIR)
-runner_DATA = lsyncd.lua
-else
-# or compiles it into the binary
-lsyncd_LDADD += luac.o
+doc/lsyncd.1: doc/manpage.lsyncd.xml
+	$(XP) -o $@ $(DB2MAN) $<
 
-objarch: | lsyncd.o
-	objdump -f lsyncd.o | grep architecture | \
-		sed -e "s/,.*$$//" -e "s/[^ ]* \(.*\)/\1/" > $@ || rm $@
+doc/lsyncd.conf.xml.5: doc/manpage.lsyncd.conf.xml
+	$(XP) -o $@ $(DB2MAN) $< 
 
-objtarget: | lsyncd.o
-	objdump -f lsyncd.o | grep "file format" | \
-		sed -e "s/.* \(.*\)/\1/" > $@ || rm $@
-
-luac.o: luac.out objarch objtarget
-	objcopy --input-target=binary \
-		--output-target=`cat objtarget` \
-		--binary-architecture=`cat objarch` $< $@
-
-luac.out: lsyncd.lua
-	luac $<
+AM_CFLAGS=-Wall 
+AM_LDFLAGS=
+if XML_CONFIG
+DEFS+=-DXML_CONFIG
+AM_CFLAGS += `xml2-config --cflags`
+AM_LDFLAGS += `xml2-config --libs`
 endif
 

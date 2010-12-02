@@ -1,29 +1,7 @@
-02-12-2010: 2.0.0
-	a complete recoding!
-
-	change:      format of command line arguments changed completly.
-	improvement: the config files format is not LUA instead of XML
-	             allowing a range from easy configuration up until 
-				 complete scripts
-	enhancement: difference actions on different kind of events
-	             effents are combined logically.
-	enhancement: allow moves to moved on the target (rsyncssh)
-	enhancement: excludes now allow simple file patterns (?, * and **)
-	enhancement: optionally there is now a statusfile
-	improvement: multiple target queues do not interfer with each other
-	improvement: Lsyncd2 will no longer wait for child processes to return
-	             the monitor queue is constantly empties as long Lsyncd runs
-	improvement: Lsyncd2 can now retry operations on network failure and
-	             queue events up.
-	improvement: There are now several debugging categories that can be 
-	             turned on individually.
-	change:      manpage is now written in asciidoc
-	change:      most more complex logic of Lsyncd is now written in Lua.
-
 04-10-2010:  1.39
 	enhancement: call action for multiple targets simultanously
 	fix: correctly accept <file-filter/> from config xml
-	fix: correctly close and free the inotify file descriptor in case of restart
+	fix: correctly close and free the inotify file descriptor in case of restart 
 	     due to HUP signal or OVERFLOW condition
 	fix: when delay=0 a bug always called rsync file filter even when in 
 	     directory mode 
@@ -74,4 +52,3 @@
 	Thanks to all contributers!
 
 05-12-2007:  Release of lsyncd 1.0 
-
