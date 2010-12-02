@@ -3,7 +3,7 @@
 <wiki:toc max_depth="2" />
 
 = Introduction =
-Lsyncd version 2.0 is currently at beta1 as a complete recode of Lsyncd 1.x. *This manual is as well in development*.
+This Manual aims to be a full documentation of Lsyncd version 2.0 capabilities and go into detail about it config scripts interface.
 
 = What's new in 2.0? =
   * Lsyncd 2.x allows you to specify different actions for different kind of events. Particularly moves can now be implemented to be moved locally at the target instead of hitherto deletion of the origin and retransfer of the destination.
