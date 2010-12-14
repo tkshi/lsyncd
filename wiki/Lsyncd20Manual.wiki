@@ -159,17 +159,17 @@ You can change the "-lts" part by specifying other {{{rsyncOps}}}. 'd' or 'r' op
 
 Example:
 {{{
-sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOpts="-ltus"}
+sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps="-ltus"}
 }}}
 
 ==== default.rsyncssh ====
 This configuration differs from standard rsync in that it uses ssh commands to move files or directory locally at the target instead of transfering them over the wire. This configuration does spawn rsyncs like default.ssh but additionally will spawn {{{/usr/bin/ssh HOST mv ORIGIN DESTINATION}} commands. Per default it waits up to 10 seconds and will spawn up to 10 synchronous processes.
 
-Different to default.rsync it does not take an uniform {{{target}}} parameter, but needs {{{host}}} and {{{targetdir}}} separated. Again rsync short options can be changed with {{{rsyncOpts}}}
+Different to default.rsync it does not take an uniform {{{target}}} parameter, but needs {{{host}}} and {{{targetdir}}} separated. Again rsync short options can be changed with {{{rsyncOps}}}
 
 Example:
 {{{
-sync{source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOpts="-ltus"}
+sync{source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOps="-ltus"}
 }}}
 
 === Exclusions ===
