@@ -59,7 +59,7 @@ Also like any unix tools --version or -version will let it print its version num
 lsyncd -version
 }}}
 
-Lsyncd 2.0 is designed to be primarily configured through a config file (see below). The config file can thus be the only command line optin.
+Lsyncd 2.0 is designed to be primarily configured through a config file (see below). The config file can thus be the only command line option.
 {{{
 lsyncd CONFIGFILE
 }}}
@@ -237,7 +237,7 @@ When there is no {{{onMove}}} or the move goes into or out of the observed direc
 
 The action to be taken is specified as a Lua String. Thus they can be delimited with anything Lua allows, thes are 'TEXT', "TEXT", or [[TEXT]] as used in {{onStartup}} in the example above. 
 
-Any action starting with a "/" result in the binary starting at the beginning directly being called by Lsyncd. For example
+Any action starting with a "/" results in the binary starting at the beginning directly being called by Lsyncd. For example
 {{{
    onCreate = "/usr/bin/zip /usr/var/all.zip ^sourceName"
    onModify = "/usr/bin/zip /usr/var/all.zip ^sourceName"
@@ -264,7 +264,7 @@ From the example above, it moves the file or directory in the target directory.
     onMove   = "mv ^o.targetPathname ^d.targetPathname",
 }}}
 
-A few word on the startup of the example. It looks a little more complicated, but it is just some bash scripting, nothing Lsyncd specifc. It simply does a recursive copy of the source to the target, but first tests if there is anything in the sourcefile. Otherwise the command returns a non-zero error code.
+A few words on the startup of the example. It looks a little more complicated, but it is just some bash scripting, nothing Lsyncd specifc. It simply does a recursive copy of the source to the target, but first tests if there is anything in the sourcefile. Otherwise the command returns a non-zero error code.
 
 {{{
     onStartup = [[if [ "$(ls -A ^source)" ]; then cp -r ^source* ^target; fi]],
@@ -286,7 +286,7 @@ While Layer 4 and 3 feel like normal configuration files, Layer 2 and 1 enter th
 
 Instead of designating actions as strings as in Layer 3 Lua functions can used to do some small scripts right within Lsyncd.
 
-This example will convert any convert any file with the suffix ".ps" created in a directory into a pdf.
+This example will convert any file with the suffix ".ps" created in a directory into a pdf.
 
 {{{
 autopdf = {
@@ -310,7 +310,7 @@ Spawns a new process associated with the event (or event list, see below) as fir
 
 If the third parameter is "<" it and the forth will not be passed as argument to the binary. The forth parameter is a string that will piped through stdin to the binary.
 
-Do not use Luas {{{os.execute}}} as differently to Lsyncds {{{spawn()}}} it will block an thus block the whole Lsyncd daemon until the command is completed. Lsyncds {{{spawn}}} on the other hand returns immediately while the child process runs.
+Do not use Luas {{{os.execute}}} as differently to Lsyncds {{{spawn()}}} it will block and thus block the whole Lsyncd daemon until the command is completed. Lsyncds {{{spawn}}} on the other hand returns immediately while the child process runs.
 
 ===== spawnShell(Event, Command, ... ) =====
 The same as spawn(), only it will invoke a shell. Any parameters are referred as $1, $2, $3 and so on in the command. 
@@ -346,7 +346,7 @@ Variables of the actions are given by the _event_ field. It has following fields
 
 onMove actions have two events as parameter, the origin and the destination of the move.
 
-This example will tattle about all moves within the observed dirotery tree.
+This example will tattle about all moves within the observed directory tree.
 {{{
 tattleMove = {
     onMove = function(oEvent, dEvent)
@@ -392,8 +392,8 @@ Inlet functions are:
 The list returned by getEvents can be handed to spawn{} as _agent_ just as well as singular events.
 
 Lists have following functions 
-|| elist.getPaths(delimiter)       || returns a string of the paths (as in {{{event.path}}} separated by {{{delimiter}}}. By default \n is user as delimiter. ||
-|| elist.getSourcePaths(delimiter) || returns a string of the sourcePaths (as in {{{event.sourcePath}}} separated by {{{delimiter}}}. By default \n is user as delimiter. ||
+|| elist.getPaths(delimiter)       || returns a string of the paths (as in {{{event.path}}} separated by {{{delimiter}}}. By default \n is used as delimiter. ||
+|| elist.getSourcePaths(delimiter) || returns a string of the sourcePaths (as in {{{event.sourcePath}}} separated by {{{delimiter}}}. By default \n is used as delimiter. ||
 
 Take care calling getEvents() and its function since depending on the amount of events, they will cause quite some CPU load.
 
@@ -574,7 +574,7 @@ MyClass = (function()
     return { new = new }
 end)()
 }}}
-In plain interpretation this creates a global variable called "MyClass". It defines an unnamed function with internal variables and subfunctions. This functions returns a table of all functions that should be visible from the outside. Then the unnamed function is called immediately called on the global definition of "MyClass" and the public interface table stored in "MyClass". {{{MyClass.new()}}} is then used to create objects of this class. Or if it is a "Singelton", it has no new function, but other functions, that would be considered "static" in an object oriented language.
+In plain interpretation this creates a global variable called "MyClass". It defines an unnamed function with internal variables and subfunctions. This functions returns a table of all functions that should be visible from the outside. Then the unnamed function is immediately called on the global definition of "MyClass" and the public interface table stored in "MyClass". {{{MyClass.new()}}} is then used to create objects of this class. Or if it is a "Singelton", it has no new function, but other functions, that would be considered "static" in an object oriented language.
 
 Lua has developed a culture for personal adaption - "power patches". To not throw a stick into any package maintainer Lsyncd uses standard from the stock Lua (5.1).
 
@@ -585,4 +585,4 @@ Lua has been chosen for Lsyncd 2 much out of the same reasons why C was chosen f
 
 The move from a pure C implementation as in Lsyncd 1.x to using Lua was motivated by enhancing the configuration file format. XML was starting to get clunky for the requirements of Lsyncd. When used Lua bindings already for config file parsing, there was little reason not to move large parts of Lsyncd internal logic into Lua as well. With its garbage collector memory management became much easier, and with its highly optimized tables as dictionaries some things even become faster, as Lsyncd 1.x linearly traversed a lot of lists, while Lsyncd 2 uses Lua tables as hash tables everywhere. 
 
-Lua was chosen over other script languages not because I think Lua is the greatest thing on earth - like many coders think about their favorite language. But because it is considered to be a appropriate tool for this task. Many coders like [X] so much, they want to do everything with it, also because after a while they know [X] very well, and are of course faster in solving an issue than learning [Y]. I on the other hand didn't know Lua before Lsyncd 2 at all, and decided explicitly for it out of pragmatic reasons. First it is said have originated out of the need for configuration files for C applications. Much the use case Lsyncd needs. So the C interface is handy and fast. Since Lsyncd has its parts close to the system still coded in C this interfacing makes things easier. Lua is very fast. Without affronting other script languages one can say it is at least in the top tier regarding speed. It may the fastest scripts there is, but this statement might raise debates. But not without reason it got quite some attention from the gaming industry. It gets even faster with LuaJIT and is gets into the range of JavaJIT (which is a compiled and not a script language). Lua has also a very slim standard library, while this is a stopper for people just wanting to quickly write some script this plays into the hands of Lsyncd. It comes with little requirements on the machine to be installed and Lsyncd comes with its own custom core functionally anyway. And altough the LUA syntax looks a bit dirty at first - like implicit on the fly creation of globals - with a little configuration this can be banned. Like Lsyncd does in normal operation modes. 
+Lua was chosen over other script languages not because I think Lua is the greatest thing on earth - like many coders think about their favorite language. But because it is considered to be a appropriate tool for this task. Many coders like [X] so much, they want to do everything with it, also because after a while they know [X] very well, and are of course faster in solving an issue than learning [Y]. I on the other hand didn't know Lua before Lsyncd 2 at all, and decided explicitly for it out of pragmatic reasons. First it is said have originated out of the need for configuration files for C applications. Much the use case Lsyncd needs. So the C interface is handy and fast. Since Lsyncd has its parts close to the system still coded in C this interfacing makes things easier. Lua is very fast. Without affronting other script languages one can say it is at least in the top tier regarding speed. It may be the fastest scripting language there is, but this statement might raise debates. But not without reason it got quite some attention from the gaming industry. It gets even faster with LuaJIT and it gets into the range of JavaJIT (which is a compiled and not a script language). Lua has also a very slim standard library, while this is a stopper for people just wanting to quickly write some script this plays into the hands of Lsyncd. It comes with little requirements on the machine to be installed and Lsyncd comes with its own custom core functionally anyway. And although the LUA syntax looks a bit dirty at first - like implicit on the fly creation of globals - with a little configuration this can be banned. Like Lsyncd does in normal operation modes. 
