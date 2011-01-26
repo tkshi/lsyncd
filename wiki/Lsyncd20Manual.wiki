@@ -148,7 +148,13 @@ sync{default.rsync, source="DIRNAME", target="DIRNAME"}
 }}}
 The order of the arguments is of no importance. If target is a local directory, take care it is an absolute pathname. You can add several syncs that way. The source dirs may be identical or one a subdirectory of another. {{{source}}} is an universal parameters that has must be given for every sync. All other {{{sync}}} parameters can differ depending on the behavior selected. Universally optional you can override the default or settings values {{{maxDelays}}} or {{{maxProcesses}}} per _Sync_. 
 
-Following are default behaviors explained you can select from.
+One can also skip the initial rsync process by using the {{init}} option:
+{{{
+sync{default.rsync, source="DIRNAME", target="DIRNAME", init=false}
+}}}
+This is an optimization which can be dangerous; so, please use only if you are sure that source and target are synchronized when Lsyncd is started.
+
+In the following, the two default behaviors that you can select from are explained.
 
 ==== default.rsync ====
 The default rsync configuration will aggregate events up to 20 seconds or 1000 separate uncollapsible events, which ever happens first. Then it will spawn one rsync with a filter of all files that actually changed. The filter list is transfered trough a pipe. A call from Lsyncd to rsync will thus look like this:
