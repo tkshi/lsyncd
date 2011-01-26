@@ -3,7 +3,7 @@
 <wiki:toc max_depth="2" />
 
 = Introduction =
-This Manual aims to be a full documentation of Lsyncd version 2.0 capabilities and go into detail about it config scripts interface.
+This Manual aims to be a full documentation of Lsyncd version 2.0 capabilities and go into detail about its config scripts interface.
 
 = What's new in 2.0? =
   * Lsyncd 2.x allows you to specify different actions for different kind of events. Particularly moves can now be implemented to be moved locally at the target instead of hitherto deletion of the origin and retransfer of the destination.
@@ -14,7 +14,7 @@ This Manual aims to be a full documentation of Lsyncd version 2.0 capabilities a
 
   * Lsyncd can be configured to run multiple processes at once for one child. It will resolve any conflicts and only run processes in parallel for files and directories that don't interfere with each other.
 
-  * Lsyncd 2.x does no longer halt and wait for a return of child processes it spawned. The kernels inotify queue will thus continously being drained making _Overflows_ less likely.
+  * Lsyncd 2.x does no longer halt and wait for a return of child processes it spawned. The kernels inotify queue will thus continuously being drained making _Overflows_ less likely.
 
   * The format of the config file has changed completely. Instead of XML the configuration file has to be valid [http://www.lua.org/ Lua syntax]. 
 
@@ -34,7 +34,7 @@ This Manual aims to be a full documentation of Lsyncd version 2.0 capabilities a
 
 = Compiling Lsyncd =
 
-Building Lsyncd is a straight forward standard process for unix packages. Unpack the downloaded tar.gz-file and run:
+Building Lsyncd is a straight forward standard process for Unix packages. Unpack the downloaded tar.gz-file and run:
 {{{
 ./configure
 make
@@ -47,7 +47,7 @@ With this standard configuration the parts of Lsyncd written in Lua (the runner)
 
 = Invoking Lsyncd =
 
-As any unix tool, Lsyncd will print a synopsis of its command line options when called with --help. 
+As any Unix tool, Lsyncd will print a synopsis of its command line options when called with --help. 
 {{{
 lsyncd --help
 lsyncd -help
@@ -64,7 +64,7 @@ Lsyncd 2.0 is designed to be primarily configured through a config file (see bel
 lsyncd CONFIGFILE
 }}}
 
-Altough for standard use or quick testing it can be cursorily facilely configured by commandline. This will keep a local src and dst directory in sync using rsync.
+Although for standard use or quick testing it can be cursorily facilely configured by command line options. This will keep a local src and dst directory in sync using rsync.
 {{{
 lsyncd -rsync /home/USER/src /home/USER/dst
 }}}
@@ -84,7 +84,7 @@ A disadvantage with rsync synchronization is that normally directory and file mo
 lsyncd -rsyncssh /home/USER/src REMOTEHOST TARGETDIR
 }}}
 
-When testing Lsyncd configurations {{{-nodaemon}}} is a pretty handy flag. With this lsyncd will not detach and become a daemon. All log messages are additionally to the configured logging facilities printed on the console (_stdout_ and _stderr_). 
+When testing Lsyncd configurations {{{-nodaemon}}} is a pretty handy flag. With this option, Lsyncd will not detach and will not become a daemon. All log messages are additionally to the configured logging facilities printed on the console (_stdout_ and _stderr_). 
 {{{
 lsyncd -nodaemon CONFIGFILE
 }}}
@@ -100,7 +100,7 @@ This might easily become too much tough. A particularly useful category might be
 lsyncd -log Exec CONFIGFILE
 }}}
 
-Part of lsyncd is written in Lua. By default it is directly compiled into the binary, but can be configured at compiletime and runtime to be loaded from a file as well. To see where the a lsyncd binary will draw its runner from, just call it with {{-runner}}:
+Part of Lsyncd is written in Lua. By default it is directly compiled into the binary, but can be configured at compile time and runtime to be loaded from a file as well. To see where the Lsyncd binary will draw its runner from, just call it with {{-runner}}:
 {{{
 lsyncd -runner
 }}}
@@ -138,11 +138,11 @@ Additionally some parameters can be configured, which are inherited by all _Sync
 || maxProcesses    || = || NUMBER || Lysncd does not spawn more than these number of processes per sync ||
 
 
-== Layer 4 Configuration: Default Behaviour == 
+== Layer 4 Configuration: Default Behavior == 
 
-You can simply choose from a set of default configurations. There are currently two default configs to choose from: __rsync__ and __rsyncssh__.
+You can simply choose from a set of default configurations. There are currently two default configurations to choose from: __rsync__ and __rsyncssh__.
 
-To sync a local directory using default rsync behaviour just add this to a config file:
+To sync a local directory using default rsync behavior just add this to a config file:
 {{{
 sync{default.rsync, source="DIRNAME", target="DIRNAME"}
 }}}
@@ -151,7 +151,7 @@ The order of the arguments is of no importance. If target is a local directory, 
 Following are default behaviors explained you can select from.
 
 ==== default.rsync ====
-The default rsync configuration will aggregate events up to 20 seconds or 1000 seperate uncollapsible events, which ever happens first. Then it will spawn one rsync with a filter of all files that actually changed. The filter list is transfered trough a pipe. A call from Lsyncd to rsync will thus look like this:
+The default rsync configuration will aggregate events up to 20 seconds or 1000 separate uncollapsible events, which ever happens first. Then it will spawn one rsync with a filter of all files that actually changed. The filter list is transfered trough a pipe. A call from Lsyncd to rsync will thus look like this:
 {{{
 /usr/bin/rsync -ltsd --delete --include-from=- --exclude=* SOURCE TARGET
 }}}
@@ -163,7 +163,7 @@ sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps="-ltus"}
 }}}
 
 ==== default.rsyncssh ====
-This configuration differs from standard rsync in that it uses ssh commands to move files or directory locally at the target instead of transfering them over the wire. This configuration does spawn rsyncs like default.ssh but additionally will spawn {{{/usr/bin/ssh HOST mv ORIGIN DESTINATION}} commands. Per default it waits up to 10 seconds and will spawn up to 10 synchronous processes.
+This configuration differs from standard rsync in that it uses ssh commands to move files or directory locally at the target instead of transferring them over the wire. This configuration does spawn rsync processes like default.ssh but additionally will spawn {{{/usr/bin/ssh HOST mv ORIGIN DESTINATION}} commands. Per default it waits up to 10 seconds and will spawn up to 10 synchronous processes.
 
 Different to default.rsync it does not take an uniform {{{target}}} parameter, but needs {{{host}}} and {{{targetdir}}} separated. Again rsync short options can be changed with {{{rsyncOps}}}
 
@@ -177,7 +177,7 @@ Two additional parameters can be specified two sync{}
 || excludeFrom     || = || FILENAME || loads exclusion rules from this file, on rule per line        ||
 || exclude         || = || LIST     || loads exclusion rules from this list of strings      ||
 
-Exclusion rules are modeled after rsyncs exclussion patterns. Just a bit simpler. Lsyncd supports this features.
+Exclusion rules are modeled after rsync's exclusion patterns. Just a bit simpler. Lsyncd supports this features.
 
  * Generally if any part of the pathname (see below Layer 3) of an event matches the text, it is excluded. E.g. the file "/bin/foo/bar" matches the rule "foo".
  * If the rule starts with a slash, it will only be matched at the beginning of the pathname
@@ -208,7 +208,7 @@ bash = {
 }
 }}}
 
-The example explained step by step. Technically any Lsyncd configuration a lua table with a set of keys filled out. Thus it starts by creating a variable called {{{bash}}} and assigns it a table with = { ... }.
+The example explained step by step. Technically any Lsyncd configuration a Lua table with a set of keys filled out. Thus it starts by creating a variable called {{{bash}}} and assigns it a table with = { ... }.
 
 {{{
 bash = {
@@ -235,7 +235,7 @@ When there is no {{{onMove}}} or the move goes into or out of the observed direc
 
 {{{onStartup}}} will always block all other actions for this _Sync_ until completed, regardless how big {{{maxProcesses}}} is.
 
-The action to be taken is specified as a Lua String. Thus they can be delimited with anything Lua allows, thes are 'TEXT', "TEXT", or [[TEXT]] as used in {{onStartup}} in the example above. 
+The action to be taken is specified as a Lua String. Thus they can be delimited with anything Lua allows, these are 'TEXT', "TEXT", or [[TEXT]] as used in {{onStartup}} in the example above. 
 
 Any action starting with a "/" results in the binary starting at the beginning directly being called by Lsyncd. For example
 {{{
@@ -257,14 +257,14 @@ All possible variables:
 || ^targetPath || The "target" arrbiuted of the config appended by the relative path of the file or directory. Directories have a slash at the end. ||
 || ^targetPathname || Same as ^targetPath but directories have no slash at the end. ||
 
-For {{{onMoves}}} a _o._ and or _d._ can be preppended to path, pathname, sourcePath sourcePathname, targetPath and targetPathname to specify the move origin or destination. Without neither the variables refers to the move origin. 
+For {{{onMoves}}} a _o._ and or _d._ can be prepended to path, pathname, sourcePath sourcePathname, targetPath and targetPathname to specify the move origin or destination. Without neither the variables refers to the move origin. 
 
 From the example above, it moves the file or directory in the target directory.
 {{{
     onMove   = "mv ^o.targetPathname ^d.targetPathname",
 }}}
 
-A few words on the startup of the example. It looks a little more complicated, but it is just some bash scripting, nothing Lsyncd specifc. It simply does a recursive copy of the source to the target, but first tests if there is anything in the sourcefile. Otherwise the command returns a non-zero error code.
+A few words on the startup of the example. It looks a little more complicated, but it is just some bash scripting, nothing Lsyncd specific. It simply does a recursive copy of the source to the target, but first tests if there is anything in the source file. Otherwise the command returns a non-zero error code.
 
 {{{
     onStartup = [[if [ "$(ls -A ^source)" ]; then cp -r ^source* ^target; fi]],
@@ -286,7 +286,7 @@ While Layer 4 and 3 feel like normal configuration files, Layer 2 and 1 enter th
 
 Instead of designating actions as strings as in Layer 3 Lua functions can used to do some small scripts right within Lsyncd.
 
-This example will convert any file with the suffix ".ps" created in a directory into a pdf.
+This example will convert any file with the suffix ".ps" created in a directory into a PDF.
 
 {{{
 autopdf = {
@@ -310,7 +310,7 @@ Spawns a new process associated with the event (or event list, see below) as fir
 
 If the third parameter is "<" it and the forth will not be passed as argument to the binary. The forth parameter is a string that will piped through stdin to the binary.
 
-Do not use Luas {{{os.execute}}} as differently to Lsyncds {{{spawn()}}} it will block and thus block the whole Lsyncd daemon until the command is completed. Lsyncds {{{spawn}}} on the other hand returns immediately while the child process runs.
+Do not use Lua's {{{os.execute}}} as differently to Lsyncd's {{{spawn()}}} it will block and thus block the whole Lsyncd daemon until the command is completed. Lsyncds {{{spawn}}} on the other hand returns immediately while the child process runs.
 
 ===== spawnShell(Event, Command, ... ) =====
 The same as spawn(), only it will invoke a shell. Any parameters are referred as $1, $2, $3 and so on in the command. 
@@ -354,15 +354,15 @@ tattleMove = {
     end,
 }}}
 
-A general tip about writing action function is to keep them short and fast. They are running right within Lsyncds one and only main thread. If you have to do any more time consuming calculations _spawn{}_ a child process instead. 
+A general tip about writing action function is to keep them short and fast. They are running right within Lsyncd's one and only main thread. If you have to do any more time consuming calculations _spawn{}_ a child process instead. 
 
 There can only be one child process associated to a event.
 
-Layer 3 is nothing else than Lsyncd automatically write Layer 2 functions for you on initialization. Start lsyncd with {{{-log FWrite}}} on a Layer 3 configuration to see what functions it dynamically writes and loads for you. Thus Layer 3 and 2 can also be be mixed at will.
+Layer 3 is nothing else than Lsyncd automatically write Layer 2 functions for you on initialization. Start Lsyncd with {{{-log FWrite}}} on a Layer 3 configuration to see what functions it dynamically writes and loads for you. Thus Layer 3 and 2 can also be be mixed at will.
 
 == Layer 1 Configuration: Inlets == 
 
-Layer 2 allows you to create one process per one event. However, as with default rsync behavior you might want to call one process for several events. This can be done with inlets. When any event becomes ready Lsyncd calls the {{{action}}} entry with {{{inlet}}} as parameter. The {{{inlet}}} can be used to grap ready single events or event lists.
+Layer 2 allows you to create one process per one event. However, as with default rsync behavior you might want to call one process for several events. This can be done with inlets. When any event becomes ready Lsyncd calls the {{{action}}} entry with {{{inlet}}} as parameter. The {{{inlet}}} can be used to grab ready single events or event lists.
 
 For example this is the action used by default.rsync:
 {{{
@@ -404,7 +404,7 @@ Layer 2 functions is nothing else than following layer 1 action loaded by the de
 -- Default action calls user scripts on**** functions.
 --
 action = function(inlet)
-    -- in case of moves getEvent returns the origin and dest of the move
+    -- in case of moves getEvent returns the origin and destination of the move
     local event, event2 = inlet.getEvent()
     local config = inlet.getConfig()
     local func = config["on".. event.etype]
@@ -466,7 +466,7 @@ end,
 
 When child processes are finished and their zombie processes are collected, Lsyncd calls the function of the {{{collect}}} entry. When collect return "again" the status of the agent (an event or an event list) will be set on "wait" again, and will become ready in {{{delay}}} seconds (or 1 second if smaller).
 
-The default collect function looks in the exitcodes[] table for an entry of the exitcode. Otherwise most of the unfortunately longer code below does nothing but making nice log message.
+The default collect function looks in the exitcodes[] table for an entry of the exit code. Otherwise most of the unfortunately longer code below does nothing but making nice log message.
 
 {{{
 -----
@@ -519,7 +519,7 @@ end,
 == Layer 4 Examples ==
 
 == Layer 3 Examples ==
- * [ExampleGForce Forces a local directorytree to be read/writeable by a group.] 
+ * [ExampleGForce Forces a local directory tree to be read/writable by a group.] 
 
 == Layer 2 Examples ==
 
@@ -533,24 +533,24 @@ When developing it is wise to configure Lsyncd to load the runner from your deve
 ./configure --with-runner=/home/USER/lsyncd2/
 }}}
 
-== Roadmap ==
+== Road map ==
 
-Lsycnd 2.0 release 
+Lsyncd 2.0 release 
  * man pages 
- * an automatic testsuite like lsyncd 1.x has (some unit tests)
+ * an automatic test suite like Lsyncd 1.x has (some unit tests)
  * user feedback on beta releases
 
 While work could go on, there is a moment to call things pause and postpone some work to later.
 
 Lsyncd 2.1+: (any future versions)
- * Optimization of the _Delay_ construct. Lsyncd goes a few times linearly through its delay Fifo where it would not have to. Code it as Queue and use pathnames as hashtables to quickly find blocks.
- * fanotify support - brand new in linux 2.6.36, supercedes inotify and using this saves a lot of kernel memory if watching big source dirs.
+ * Optimization of the _Delay_ construct. Lsyncd goes a few times linearly through its delay Fifo where it would not have to. Code it as Queue and use pathnames as hash tables to quickly find blocks.
+ * fanotify support - brand new in linux 2.6.36, supercedes inotify and using this saves a lot of kernel memory if watching big source directories.
  * fsevents support - similar to i/fanotify, but on OS X 
  * support for includes, currently only masks for excludes are supported.
- * Supposedly tons of bug fixes to Lsyncd 2.0(betaX)
+ * Supposedly tons of bug fixes to Lsyncd 2.0 (betaX)
 
 == Code structure / Style guide ==
-At large Lsyncds in source code comment documentation is well developed - at least compared to many other software projects. Here thus only a few outlining words.
+At large, Lsyncd's documentation contained in source code comments is well developed - at least compared to many other software projects. Here thus only a few outlining words.
 
 Lsyncd 2 is partially written in C, partially written in Lua. For some code pieces it is a free decision in which it could be coded, but for most one of the two was more appropriate. Generally the goal was if there was no good reason to code something in C do it in Lua. The C core thus does all the stuff close to the operating system:
  * inotify interface
@@ -558,7 +558,7 @@ Lsyncd 2 is partially written in C, partially written in Lua. For some code piec
  * signals
  * pipes 
  * logging (also in the core, so it can log itself comfortably)
- * alarms (lsyncd uses kernel jiffies as alarms, thus it should be year Y2K38 safe (the year in which an often used time measurement - seconds since 1970 will overflow)
+ * alarms (Lsyncd uses kernel jiffies as alarms, thus it should be year Y2K38 safe (2038 is the year in which an often used time measurement - seconds since 1970 - will overflow.)
 Everything else is done in lsyncd.lua.
 
 While Lua is not an object oriented language itself, it supplies a set of features which can emulate its features quite nicely. Shortly spoken, it supports prototyping. Lsyncd makes use of local function scoping to create blocks of code which are loosely connected with each other. A major feature of object oriented language.
@@ -585,4 +585,4 @@ Lua has been chosen for Lsyncd 2 much out of the same reasons why C was chosen f
 
 The move from a pure C implementation as in Lsyncd 1.x to using Lua was motivated by enhancing the configuration file format. XML was starting to get clunky for the requirements of Lsyncd. When used Lua bindings already for config file parsing, there was little reason not to move large parts of Lsyncd internal logic into Lua as well. With its garbage collector memory management became much easier, and with its highly optimized tables as dictionaries some things even become faster, as Lsyncd 1.x linearly traversed a lot of lists, while Lsyncd 2 uses Lua tables as hash tables everywhere. 
 
-Lua was chosen over other script languages not because I think Lua is the greatest thing on earth - like many coders think about their favorite language. But because it is considered to be a appropriate tool for this task. Many coders like [X] so much, they want to do everything with it, also because after a while they know [X] very well, and are of course faster in solving an issue than learning [Y]. I on the other hand didn't know Lua before Lsyncd 2 at all, and decided explicitly for it out of pragmatic reasons. First it is said have originated out of the need for configuration files for C applications. Much the use case Lsyncd needs. So the C interface is handy and fast. Since Lsyncd has its parts close to the system still coded in C this interfacing makes things easier. Lua is very fast. Without affronting other script languages one can say it is at least in the top tier regarding speed. It may be the fastest scripting language there is, but this statement might raise debates. But not without reason it got quite some attention from the gaming industry. It gets even faster with LuaJIT and it gets into the range of JavaJIT (which is a compiled and not a script language). Lua has also a very slim standard library, while this is a stopper for people just wanting to quickly write some script this plays into the hands of Lsyncd. It comes with little requirements on the machine to be installed and Lsyncd comes with its own custom core functionally anyway. And although the LUA syntax looks a bit dirty at first - like implicit on the fly creation of globals - with a little configuration this can be banned. Like Lsyncd does in normal operation modes. 
+Lua was chosen over other script languages not because I think Lua is the greatest thing on earth - like many coders think about their favorite language. But because it is considered to be a appropriate tool for this task. Many coders like [X] so much, they want to do everything with it, also because after a while they know [X] very well, and are of course faster in solving an issue than learning [Y]. I on the other hand didn't know Lua before Lsyncd 2 at all, and decided explicitly for it out of pragmatic reasons. First it is said have originated out of the need for configuration files for C applications. Much the use case Lsyncd needs. So the C interface is handy and fast. Since Lsyncd has its parts close to the system still coded in C this interfacing makes things easier. Lua is very fast. Without affronting other script languages one can say it is at least in the top tier regarding speed. It may be the fastest scripting language there is, but this statement might raise debates. But not without reason it got quite some attention from the gaming industry. It gets even faster with LuaJIT and it gets into the range of JavaJIT (which is a compiled and not a script language). Lua has also a very slim standard library, while this is a stopper for people just wanting to quickly write some script this plays into the hands of Lsyncd. It comes with little requirements on the machine to be installed and Lsyncd comes with its own custom core functionally anyway. And although the Lua syntax looks a bit dirty at first - like implicit on the fly creation of globals - with a little configuration this can be banned. Like Lsyncd does in normal operation modes. 
