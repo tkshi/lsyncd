@@ -148,7 +148,7 @@ sync{default.rsync, source="DIRNAME", target="DIRNAME"}
 }}}
 The order of the arguments is of no importance. If target is a local directory, take care it is an absolute pathname. You can add several syncs that way. The source dirs may be identical or one a subdirectory of another. {{{source}}} is an universal parameters that has must be given for every sync. All other {{{sync}}} parameters can differ depending on the behavior selected. Universally optional you can override the default or settings values {{{maxDelays}}} or {{{maxProcesses}}} per _Sync_. 
 
-One can also skip the initial rsync process by using the {{init}} option:
+One can also skip the initial rsync process by using the {{{init}}} option:
 {{{
 sync{default.rsync, source="DIRNAME", target="DIRNAME", init=false}
 }}}
