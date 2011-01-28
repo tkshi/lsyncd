@@ -168,6 +168,11 @@ Example:
 sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps="-ltus"}
 }}}
 
+Note that the {{{rsyncOps}}} value must be written as a list of strings if it would contain spaces otherwise, e.g.
+{{{
+sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps={"-ltus", "--numeric-ids", "--bwlimit=10000"} }
+}}}
+
 ==== default.rsyncssh ====
 This configuration differs from standard rsync in that it uses ssh commands to move files or directory locally at the target instead of transferring them over the wire. This configuration does spawn rsync processes like default.ssh but additionally will spawn {{{/usr/bin/ssh HOST mv ORIGIN DESTINATION}} commands. Per default it waits up to 10 seconds and will spawn up to 10 synchronous processes.
 
