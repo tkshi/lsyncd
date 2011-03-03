@@ -131,7 +131,9 @@ Valid keys for settings are:
 || logfile         || = || FILENAME || logs into this file                         ||
 || nodaemon        || = || true     || does not detach                             ||
 || statusFile      || = || FILENAME || periodically writes a status report to file ||
-|| statusIntervall || = || NUMBER   || writes the status file at shortest every Number seconds ||
+|| statusInterval || = || NUMBER   || writes the status file at shortest every Number seconds ||
+|| logfacility || = || STRING   || syslog facility, default "user" ||
+|| logident || = || STRING   || syslog identification (tag), default "lsyncd" ||
 
 Additionally some parameters can be configured, which are inherited by all _Syncs_ (see Layer 3)
 || maxDelays       || = || NUMBER || When this amount of delayed events is queued, actions will be spawned, even below the delay timer. ||
@@ -257,6 +259,21 @@ will add any newly created and modified files to /usr/var/all.zip using absolute
 
 Variable arguments are specified with the caret symbol ^. It has been chosen over $ or other symbols to be less conflicting with standard shell conventions. 
 
+Note that variables will always be implicitly quoted in double quotes, so if you want them to be a part of another double-quoted string, you will have to go one layer deeper, e.g. 
+
+{{{
+    onCreate   = [[ su user -c "/usr/bin/zip /usr/var/all.zip ^o.sourceName " ]],
+}}}
+
+will expand to {{{ su user -c "/usr/bin/zip /usr/var/all.zip "source"" }}} which is incorrect and will break. You have to rewrite the above statement one layer deeper as 
+
+{{{
+  onCreate = function(event)
+    spawnShell([[ su user -c "/usr/bin/zip /usr/var/all.zip \"$1\"" ]], event.sourceName)
+  end
+}}}
+
+
 All possible variables:
 
 || ^source || The absolute path of the observed source directory. ||
@@ -274,6 +291,7 @@ From the example above, it moves the file or directory in the target directory.
 {{{
     onMove   = "mv ^o.targetPathname ^d.targetPathname",
 }}}
+
 
 A few words on the startup of the example. It looks a little more complicated, but it is just some bash scripting, nothing Lsyncd specific. It simply does a recursive copy of the source to the target, but first tests if there is anything in the source file. Otherwise the command returns a non-zero error code.
 
