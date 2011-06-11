@@ -134,7 +134,7 @@ Valid keys for settings are:
 || statusInterval || = || NUMBER   || writes the status file at shortest every Number seconds ||
 || logfacility || = || STRING   || syslog facility, default "user" ||
 || logident || = || STRING   || syslog identification (tag), default "lsyncd" ||
-|| inotifyMode || = STRING || (Lsyncd >= 2.0.5) Specifies on inotify systems what kind of changes to listen to. Can be "Modify", "CloseWrite" (default) or "CloseWrite or Modify". ||
+|| inotifyMode || = || STRING || (Lsyncd >= 2.0.5) Specifies on inotify systems what kind of changes to listen to. Can be "Modify", "CloseWrite" (default) or "CloseWrite or Modify". ||
 
 Additionally some parameters can be configured, which are inherited by all _Syncs_ (see Layer 3)
 || maxDelays       || = || NUMBER || When this amount of delayed events is queued, actions will be spawned, even below the delay timer. ||
