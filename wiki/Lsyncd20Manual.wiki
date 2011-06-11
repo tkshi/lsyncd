@@ -167,12 +167,12 @@ You can change the "-lts" part by specifying other {{{rsyncOps}}}. 'd' or 'r' op
 
 Example:
 {{{
-sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps="-ltus"}
+sync{default.rsync, source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps="-ltus"}
 }}}
 
 Note that the {{{rsyncOps}}} value must be written as a list of strings if it would contain spaces otherwise, e.g.
 {{{
-sync{source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps={"-ltus", "--numeric-ids", "--bwlimit=10000"} }
+sync{default.rsync, source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps={"-ltus", "--numeric-ids", "--bwlimit=10000"} }
 }}}
 
 ==== default.rsyncssh ====
@@ -182,7 +182,7 @@ Different to default.rsync it does not take an uniform {{{target}}} parameter, b
 
 Example:
 {{{
-sync{source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOps="-ltus"}
+sync{default.rsync, source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOps="-ltus"}
 }}}
 
 === Exclusions ===
