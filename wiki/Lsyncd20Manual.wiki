@@ -164,26 +164,26 @@ The default rsync configuration will aggregate events up to 20 seconds or 1000 s
 {{{
 /usr/bin/rsync -ltsd --delete --include-from=- --exclude=* SOURCE TARGET
 }}}
-You can change the "-lts" part by specifying other {{{rsyncOps}}}. 'd' or 'r' options are appended to {{{rsyncOps}}} by default.rsync as needed.
+You can change the "-lts" part by specifying other {{{rsyncOpts}}}. 'd' or 'r' options are appended to {{{rsyncOpts}}} by default.rsync as needed.
 
 Example:
 {{{
-sync{default.rsync, source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps="-ltus"}
+sync{default.rsync, source="/home/user/src/", target="foohost.com:~/trg/", rsyncOpts="-ltus"}
 }}}
 
-Note that the {{{rsyncOps}}} value must be written as a list of strings if it would contain spaces otherwise, e.g.
+Note that the {{{rsyncOpts}}} value must be written as a list of strings if it would contain spaces otherwise, e.g.
 {{{
-sync{default.rsync, source="/home/user/src/", target="foohost.com:~/trg/", rsyncOps={"-ltus", "--numeric-ids", "--bwlimit=10000"} }
+sync{default.rsync, source="/home/user/src/", target="foohost.com:~/trg/", rsyncOpts={"-ltus", "--numeric-ids", "--bwlimit=10000"} }
 }}}
 
 ==== default.rsyncssh ====
 This configuration differs from standard rsync in that it uses ssh commands to move files or directory locally at the target instead of transferring them over the wire. This configuration does spawn rsync processes like default.ssh but additionally will spawn {{{/usr/bin/ssh HOST mv ORIGIN DESTINATION}} commands. Per default it waits up to 10 seconds and will spawn up to 10 synchronous processes.
 
-Different to default.rsync it does not take an uniform {{{target}}} parameter, but needs {{{host}}} and {{{targetdir}}} separated. Again rsync short options can be changed with {{{rsyncOps}}}
+Different to default.rsync it does not take an uniform {{{target}}} parameter, but needs {{{host}}} and {{{targetdir}}} separated. Again rsync short options can be changed with {{{rsyncOpts}}}
 
 Example:
 {{{
-sync{default.rsync, source="/home/user/src/", host="foohost.com", targetdir="~/trg/" rsyncOps="-ltus"}
+sync{default.rsyncssh, source="/home/user/src/", host="foohost.com", targetdir="~/trg/", rsyncOpts="-ltus"}
 }}}
 
 === Exclusions ===
@@ -404,7 +404,7 @@ action = function(inlet)
    spawn(elist, "/usr/bin/rsync",
        "<", paths,
        "--delete",
-       config.rsyncOps .. "d",
+       config.rsyncOpts .. "d",
        "--include-from=-",
        "--exclude=*",
        config.source, config.target)
@@ -488,7 +488,7 @@ init = function(inlet)
         " -> ", config.target)
     spawn(event, "/usr/bin/rsync", 
         "--delete",
-        config.rsyncOps .. "r", 
+        config.rsyncOpts .. "r", 
         config.source, 
         config.target)
 end,
