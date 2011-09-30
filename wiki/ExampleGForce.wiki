@@ -35,34 +35,34 @@ command =
 -- checks if the group is the one enforced and sets them if not 
 [[
 perm=`stat -c %A ^sourcePathname`
-if [ `stat -c %G ^sourcePathname` != ]]..fgroup..[[ ]; then
+if test `stat -c %G ^sourcePathname` != ]]..fgroup..[[; then
         /bin/chgrp ]]..fgroup..[[ ^sourcePathname || /bin/true; 
 fi 
 ]] ..
 
 -- checks if the group permissions are rw and sets them 
 [[
-if [ `expr match $perm "....rw"` == 0 ]; then 
+if test `expr match $perm "....rw"` = 0; then 
         /bin/chmod g+rw ^sourcePathname || /bin/true; 
 fi 
 ]] ..
 
 -- and forces the executable bit for directories.
 [[
-if [ -d ^sourcePathname ]; then
-        if [ `expr match $perm "......x"` == 0 ]; then 
+if test -d ^sourcePathname; then
+        if test `expr match $perm "......x"` -eq 0; then 
                 /bin/chmod g+x ^^sourcePathname || /bin/true;
         fi 
 fi 
 ]]
 
--- on startup recursevily sets all group ownerships
--- all group permissions are set to rw
+-- on startup recursively sets all group ownerships
+-- all group permissions are set to 'rw'
 -- and to executable flag for directories
 --
 -- the hash in the first line is important, otherwise due to the starting
 -- slash, Lsyncd would think it is a call to the binary /bin/chgrp only
--- and would optimize the bash away.
+-- and would optimize the shell call away.
 -- 
 startup = 
 [[#
