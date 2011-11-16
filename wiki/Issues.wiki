@@ -1,0 +1,1 @@
+Issues have been moved here: [https://github.com/axkibe/lsyncd/issues https://github.com/axkibe/lsyncd/issues]
