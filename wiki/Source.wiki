@@ -1,3 +1,3 @@
 = Source =
 
-Revision control for source code between releases is managed at github: [https://github.com/axkibe/lsyncd] Source code for releases will be a download as always.
+Lsyncd´s revision control is at Github: [https://github.com/axkibe/lsyncd]
